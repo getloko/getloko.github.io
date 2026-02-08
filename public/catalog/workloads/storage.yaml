@@ -1,0 +1,195 @@
+# Storage Workloads
+workloads:
+  garage:
+    category: storage
+    description: S3-compatible distributed object storage
+    chart:
+      repo: datahub-local
+      name: datahub-local/garage
+      # renovate: datasource=helm depName=garage repositoryUrl=https://datahub-local.github.io/garage-helm
+      version: "0.2.1"
+    defaults:
+      namespace: loko-workloads
+      ports: [3900, 3902, 3903]
+      storage:
+        size: 20Gi
+    mappings:
+      storage: persistence.data.size
+    secrets:
+      s3:
+        name: s3
+        type: api-key
+        description: S3 access credentials
+        fields:
+          - name: access_key
+            type: hex
+            format: "GK{hex:12}"  # Garage-specific format: "GK" + 24 hex chars
+            storage-key: access_key
+          - name: secret_key
+            type: hex
+            length: 32  # 64 hex chars
+            storage-key: secret_key
+        config-builder: garage_cluster_config
+      admin-token:
+        name: admin-token
+        type: token
+        description: Admin API token
+        fields:
+          - name: admin_token
+            type: token
+            length: 32
+            storage-key: admin_token
+    config-templates:
+      garage_cluster_config:
+        # Declarative cluster configuration template
+        # NOTE: After initial install, set clusterConfig.enabled=false in custom_values
+        # to avoid key import conflicts on upgrades (Garage doesn't allow re-importing keys)
+        garage:
+          secret:
+            adminToken: "${secrets.admin-token.admin_token}"
+        clusterConfig:
+          enabled: true  # Only enable for initial install
+          layout:
+            enabled: true
+            zone: loko
+            capacity: ""  # Defaults to persistence.data.size
+          buckets:
+            - name: "${env_name}-bucket"
+              public: true
+              website: true
+          keys:
+            "${env_name}-key":
+              keyId: "${secrets.s3.access_key}"
+              secretKey: "${secrets.s3.secret_key}"
+              buckets:
+                - "${env_name}-bucket"
+              allow:
+                createBucket: true
+    endpoints:
+      - name: s3
+        protocol: https
+        port: 3900
+        description: S3-compatible API
+      - name: web
+        protocol: https
+        port: 3902
+        description: Static website hosting
+      - name: admin
+        protocol: http
+        port: 3903
+        description: Admin API (internal only)
+    connection-strings:
+      - name: s3
+        template: "https://${ACCESS_KEY}:${SECRET_KEY}@garage.${DOMAIN}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: s3
+        description: Check if S3 API port is open
+      - name: s3-list
+        type: command
+        tier: client
+        image: amazon/aws-cli:latest
+        command: ["aws", "--endpoint-url", "http://${HOST}:3900", "s3", "ls"]
+        requires: ["aws"]
+        description: List S3 buckets via AWS CLI
+    presets:
+      # Core garage configuration
+      garage:
+        dbEngine: lmdb
+        replicationFactor: "1"  # String format required by chart
+        s3:
+          api:
+            region: "garage"
+            rootDomain: ".garage.${LOKO_DOMAIN}"
+          web:
+            rootDomain: ".garage.${LOKO_DOMAIN}"
+            index: "index.html"
+        secret:
+          create: true
+          adminToken: ""  # Injected by generator
+
+      # Cluster configuration - declarative setup (buckets/keys injected by generator)
+      clusterConfig:
+        enabled: true
+        layout:
+          enabled: true
+          zone: "dc1"
+          capacity: ""  # Defaults to persistence.data.size
+        buckets: []  # Populated by generator
+        keys: {}     # Populated by generator
+
+      # Persistence
+      persistence:
+        enabled: true
+        meta:
+          size: 100Mi
+        data:
+          size: 20Gi
+
+      # Deployment
+      deployment:
+        kind: StatefulSet
+        replicaCount: 1
+
+      # Ingress - Separate S3 API and Web endpoints
+      ingress:
+        s3:
+          api:
+            <<: *ingress-traefik
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.tls: "true"
+              traefik.ingress.kubernetes.io/router.priority: "100"  # Higher priority for S3 API
+            hosts:
+              - host: "garage.${LOKO_DOMAIN}"
+                paths:
+                  - path: /
+                    pathType: Prefix
+              - host: "*.garage.${LOKO_DOMAIN}"
+                paths:
+                  - path: /
+                    pathType: Prefix
+          web:
+            <<: *ingress-traefik
+            enabled: false  # Disable by default to avoid conflicts; enable only if needed for static website hosting
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.tls: "true"
+              traefik.ingress.kubernetes.io/router.priority: "50"  # Lower priority than API
+            hosts:
+              - host: "web.garage.${LOKO_DOMAIN}"
+                paths:
+                  - path: /
+                    pathType: Prefix
+              - host: "*.web.garage.${LOKO_DOMAIN}"
+                paths:
+                  - path: /
+                    pathType: Prefix
+
+      # Admin API Ingress (optional - enable if you need direct admin API access)
+      # Note: garage-webui already provides admin features via UI
+      monitoring:
+        metrics:
+          enabled: true  # Required to expose admin API port 3903
+
+      # Integrated WebUI
+      webui:
+        enabled: true
+        replicaCount: 1
+        auth:
+          enabled: false  # Can add basic auth if needed
+        ingress:
+          enabled: true
+          className: "traefik"
+          annotations:
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/router.tls: "true"
+          hosts:
+            - host: "garage-ui.${LOKO_DOMAIN}"
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - hosts:
+                - "garage-ui.${LOKO_DOMAIN}"

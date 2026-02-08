@@ -1,0 +1,39 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: ['--unsafe']
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.0
+    hooks:
+      - id: yamllint
+        args: [--strict]
+        files: ^public/catalog/.*\.yaml$
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.44.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix', '--disable', 'MD013', 'MD033', 'MD041']
+        # MD013: Line length (disabled for docs flexibility)
+        # MD033: Inline HTML (allowed in Material for MkDocs)
+        # MD041: First line heading (disabled for front matter)
+
+  - repo: https://github.com/tcort/markdown-link-check
+    rev: v3.13.6
+    hooks:
+      - id: markdown-link-check
+        args: ['--config', '.markdown-link-check.json', '--verbose']
+        types: [markdown]
+        files: \.(md|mdx)$
+        verbose: true
+        stages: [manual]

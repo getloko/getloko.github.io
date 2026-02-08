@@ -1,0 +1,306 @@
+---
+title: "LoKO - Local Kubernetes That Actually Works"
+template: splash
+hero:
+  title: "LoKO - Local Kubernetes That Actually Works"
+  tagline: Stop fighting with local Kubernetes. Start building.
+  actions:
+    - text: Get Started
+      link: /getting-started/installation/
+      icon: right-arrow
+      variant: primary
+    - text: Quick Start
+      link: /getting-started/quick-start/
+      icon: rocket
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+**LoKO** (Local Kubernetes Oasis) gives you a **complete, production-like Kubernetes environment** on your laptop in under 5 minutes. No DNS struggles, no certificate nightmares, no "it works in prod but not locally" surprises.
+
+<CardGrid>
+  <Card title="Ready in Minutes" icon="rocket">
+    ```bash
+    loko config generate
+    loko create
+    # Done. Everything works.
+    ```
+
+    DNS, TLS, registry, workloads - all configured automatically.
+  </Card>
+
+  <Card title="Real Kubernetes" icon="seti:config">
+    Not docker-compose pretending to be K8s. Not minikube with weird networking. **Actual multi-node Kubernetes** using Kind, with Ingress, LoadBalancer, and everything else.
+  </Card>
+
+  <Card title="Pre-Configured Workloads" icon="seti:db">
+    Add PostgreSQL, MySQL, MongoDB, RabbitMQ, and other services with one command. **They just work** - with DNS, ports, and passwords handled for you.
+  </Card>
+
+  <Card title="Built-in Registry" icon="seti:docker">
+    Local OCI registry at `cr.dev.me` for your images, Helm charts, and artifacts. **Push once, use everywhere** in your local cluster.
+  </Card>
+
+  <Card title="Public Tunnel Sharing" icon="external">
+    Share any local workload publicly via ngrok with one command. Demo your work, test webhooks, or collaborate — **no VPN or port forwarding needed**.
+  </Card>
+</CardGrid>
+
+---
+
+## The Problem with Local Kubernetes
+
+You've probably tried setting up local Kubernetes and hit these issues:
+
+- **DNS Hell**: Manually editing `/etc/hosts` for every service (and they stop working after sleep/reboot)
+- **Certificate Chaos**: Self-signed certs that browsers hate
+- **Port Conflicts**: "Port 5432 already in use" every time
+- **Networking Nightmares**: "Works on my machine" but not in the cluster
+- **Registry Friction**: Pushing to Docker Hub just to test locally
+- **Setup Time**: Hours of YAML, kubectl, and Stack Overflow
+
+With **docker-compose**, you get easy setup but lose Kubernetes features. With **minikube** or **bare Kind**, you get Kubernetes but spend days on DNS, ingress, and networking.
+
+**LoKO gives you both**: Easy setup **AND** real Kubernetes.
+
+---
+
+## What Makes LoKO Different
+
+### vs Docker Compose
+- ✅ Real Kubernetes API and behavior
+- ✅ Ingress, Services, NetworkPolicies work correctly
+- ✅ Test Helm charts and Kubernetes configs
+- ❌ Docker Compose: No Kubernetes features
+
+### vs Minikube
+- ✅ Multi-node clusters (test pod scheduling, affinity)
+- ✅ Faster startup (no VM overhead on Linux)
+- ✅ Better Docker integration
+- ❌ Minikube: Single-node only, slower, VM-based
+
+### vs Bare Kind
+- ✅ DNS auto-configured (*.dev.me just works)
+- ✅ TLS certificates pre-installed
+- ✅ Container registry included
+- ✅ Workload catalog (pre-configured services)
+- ✅ TCP port routing (databases accessible from host)
+- ❌ Kind: You configure everything yourself
+
+### vs Standalone Containers
+- ✅ Multi-container orchestration
+- ✅ Service discovery and DNS
+- ✅ Real networking and load balancing
+- ✅ Match production Kubernetes behavior
+- ❌ Containers: No orchestration, manual networking
+
+---
+
+## Key Features
+
+### 🌐 Automatic DNS Resolution
+Every service gets a DNS name that works **everywhere**:
+- From your browser: `https://myapp.dev.me`
+- From your terminal: `psql -h postgres.dev.me`
+- Inside the cluster: `mysql.loko-workloads.svc.cluster.local`
+
+No `/etc/hosts` hacking. No IP address memorization. **It just works.**
+
+### 🔒 TLS Certificates Included
+Wildcard certificates auto-generated with mkcert:
+- ✅ HTTPS works in browsers (no security warnings)
+- ✅ Valid for all `*.dev.me` domains
+- ✅ Your system trusts them automatically
+
+### 📦 Local Container Registry
+Push and pull images without leaving your machine:
+```bash
+docker build -t cr.dev.me/myapp:latest .
+docker push cr.dev.me/myapp:latest
+
+# Use in your pods
+kubectl run app --image=cr.dev.me/myapp:latest
+```
+
+Cache well-known images. Build and iterate fast. **No Docker Hub rate limits.**
+
+### 🗄️ Pre-Configured Workload Catalog
+Add databases, caches, message queues with **one command**:
+```bash
+loko workloads add postgres redis rabbitmq
+loko create
+```
+
+**Workloads available**:
+- **Databases**: PostgreSQL, MySQL, MongoDB
+- **Cache**: Valkey (Redis-compatible)
+- **Messaging**: RabbitMQ, NATS, Redpanda (Kafka-compatible)
+- **Storage**: Garage (S3-compatible)
+- **DevOps/GitOps**: Forgejo, ArgoCD, Flux Operator
+- **Collaboration**: Excalidraw, Penpot
+- **DevTools**: httpbin, IT Tools, mock-smtp-sms
+
+All with:
+- ✅ DNS names configured
+- ✅ Passwords auto-generated and saved
+- ✅ Ports exposed correctly
+- ✅ Health checks included
+- ✅ UI tools linked (pgAdmin, phpMyAdmin, etc.)
+
+### 🌍 Public Tunnel Sharing
+Share any workload with the outside world instantly:
+```bash
+loko tunnel share -w mysql-ui        # Share a workload by name
+loko tunnel share -i my-ingress      # Share any Kubernetes Ingress
+loko tunnel share -w myapp --detach  # Run in background
+```
+
+ngrok creates a public HTTPS URL that routes through Traefik to your local workload. **Host header rewriting is handled automatically** — no manual ngrok config needed.
+
+Use it to:
+- Demo work-in-progress to teammates
+- Test webhooks from external services (Stripe, GitHub, etc.)
+- Share a running service without exposing your IP
+
+Requires a free [ngrok account](https://ngrok.com) and `NGROK_AUTHTOKEN` set in your environment.
+
+### 🔌 Intelligent TCP Routing
+Access databases and TCP services from your host:
+```bash
+psql -h postgres.dev.me -U postgres
+redis-cli -h redis.dev.me
+mysql -h mysql.dev.me -u root
+```
+
+No port forwarding commands. No kubectl port-forward running in terminals. **Direct access that feels native.**
+
+### ☸️ Multi-Node Kubernetes
+Test real scenarios:
+```yaml
+cluster:
+  workers: 3  # Create 3-worker cluster
+```
+
+- Test pod anti-affinity
+- Simulate node failures
+- Validate HA configurations
+- Test distributed systems
+
+**Closer to production than single-node setups.**
+
+### 🚀 One Command Setup
+```bash
+loko config generate  # Creates config with smart defaults
+loko create           # Everything spins up
+```
+
+In **under 5 minutes**:
+- ✅ Multi-node Kubernetes cluster
+- ✅ DNS resolution configured
+- ✅ TLS certificates installed
+- ✅ Container registry running
+- ✅ Ingress controller deployed
+- ✅ All your workloads running
+
+---
+
+## Real Developer Workflows
+
+### Backend Developer
+```bash
+# Add PostgreSQL and Redis
+loko workloads add postgres redis
+loko create
+
+# Your app can now connect to:
+# - postgres.dev.me:5432
+# - redis.dev.me:6379
+
+# Build and deploy your app
+docker build -t cr.dev.me/api:latest .
+docker push cr.dev.me/api:latest
+kubectl apply -f k8s/
+```
+
+### Full-Stack Developer
+```bash
+# Backend services
+loko workloads add postgres redis
+loko create
+
+# Frontend served by Traefik Ingress
+# https://myapp.dev.me (with valid TLS!)
+
+# Hot reload works, DNS works, everything works
+npm run dev
+```
+
+### Platform Engineer
+```bash
+# Multi-node cluster for testing HA
+loko config generate
+# Edit: set workers: 3
+loko create
+
+# Test Helm charts
+helm install myapp ./charts/myapp
+
+# Test in real Kubernetes before pushing to staging
+kubectl apply -f manifests/
+```
+
+---
+
+## Getting Started
+
+<CardGrid>
+  <Card title="Installation" icon="document">
+    Install LoKO and prerequisites
+
+    [Get Started →](/getting-started/installation/)
+  </Card>
+
+  <Card title="Quick Start" icon="rocket">
+    Get your first cluster running
+
+    [Launch →](/getting-started/quick-start/)
+  </Card>
+
+  <Card title="Configuration" icon="setting">
+    Customize your environment
+
+    [Configure →](/user-guide/configuration/)
+  </Card>
+
+  <Card title="Workload Catalog" icon="list-format">
+    Browse pre-configured services
+
+    [Explore →](/_catalog/workloads/)
+  </Card>
+</CardGrid>
+
+---
+
+## What You Get
+
+:::tip[DNS That Just Works]
+Spent days fighting minikube DNS? LoKO configures it automatically. `postgres.dev.me` resolves everywhere - browser, terminal, cluster. Done in 5 minutes.
+:::
+
+:::tip[Real Kubernetes Without the Pain]
+Docker Compose is easy but not Kubernetes. Bare Kind is Kubernetes, but can be time consuming to set up a complete environment and is ephemeral in nature. LoKO gives you Kubernetes with everything you need configured, and you can stop the entire environment and start it again and pick up right where you left off.
+:::
+
+:::tip[Pre-Configured Services]
+Adding PostgreSQL + pgAdmin used to mean 200 lines of YAML. Now: `loko workloads add postgres` then `loko workloads add postgres-ui`. Two commands, complete setup.
+:::
+
+---
+
+## What's Next?
+
+- **[Architecture Deep-Dive](/architecture/)** - How LoKO works under the hood
+- **[Compare LoKO](/comparisons/)** - vs Docker Compose, Minikube, Kind
+- **[First Tutorial](/tutorials/first-cluster/)** - Build your first cluster
+
+Ready to try it? [Install LoKO →](/getting-started/installation/)

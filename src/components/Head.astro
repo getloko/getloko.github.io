@@ -1,0 +1,64 @@
+---
+// Custom Head component to add Mermaid zoom functionality
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Head.astro';
+---
+
+<Default {...Astro.props}><slot /></Default>
+
+<script is:inline>
+  // Add click-to-zoom functionality for Mermaid diagrams
+  document.addEventListener('DOMContentLoaded', () => {
+    const mermaidDiagrams = document.querySelectorAll('pre.mermaid svg');
+
+    mermaidDiagrams.forEach((svg) => {
+      // Make the SVG clickable
+      svg.style.cursor = 'zoom-in';
+
+      svg.addEventListener('click', () => {
+        // Create a modal overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          cursor: zoom-out;
+        `;
+
+        // Clone the SVG and make it larger
+        const clonedSvg = svg.cloneNode(true);
+        clonedSvg.style.cssText = `
+          max-width: 95vw;
+          max-height: 95vh;
+          width: auto;
+          height: auto;
+          cursor: zoom-out;
+        `;
+
+        overlay.appendChild(clonedSvg);
+        document.body.appendChild(overlay);
+
+        // Close on click
+        overlay.addEventListener('click', () => {
+          document.body.removeChild(overlay);
+        });
+
+        // Close on Escape key
+        const handleEscape = (e) => {
+          if (e.key === 'Escape') {
+            document.body.removeChild(overlay);
+            document.removeEventListener('keydown', handleEscape);
+          }
+        };
+        document.addEventListener('keydown', handleEscape);
+      });
+    });
+  });
+</script>

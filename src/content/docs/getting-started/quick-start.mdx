@@ -1,0 +1,508 @@
+---
+title: "Quick Start"
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+
+**Go from zero to production-like Kubernetes in under 5 minutes.**
+
+No DNS configuration. No certificate headaches. No port-forwarding gymnastics. Just a complete, working Kubernetes environment ready for development.
+
+---
+
+## What You'll Build
+
+By the end of this guide, you'll have:
+
+- ✅ **Multi-node Kubernetes cluster** running locally
+- ✅ **PostgreSQL database** accessible at `postgres.dev.me`
+- ✅ **pgAdmin web UI** at `https://postgres-ui.dev.me` (no certificate warnings!)
+- ✅ **Local container registry** at `cr.dev.me`
+- ✅ **Your own app** deployed and accessible via HTTPS
+
+**Total time**: ~5 minutes (mostly waiting for downloads)
+
+:::caution[Upgrading from older versions?]
+**v0.3.0 introduced a new CLI structure.** Old commands like `loko create`, `loko start`, `loko workloads add` are now:
+- `loko env create`, `loko env start`, `loko env stop`, `loko env destroy`
+- `loko workloads add`, `loko workloads deploy`, `loko logs workload` (singular)
+- `loko check prerequisites` (was `loko check prerequisites`)
+
+See the [migration guide](/reference/commands) for full details.
+:::
+
+---
+
+## Prerequisites
+
+Verify you have everything installed:
+
+```bash
+loko check prerequisites
+```
+
+**Missing something?** → [Installation Guide](installation)
+
+:::note[First-run prerequisite checks]
+When you run **any** loko command for the first time, loko automatically checks if required tools (Docker, kind, kubectl, helm, mkcert, helmfile) are installed. If any are missing, you'll see clear installation guidance. Use `loko check prerequisites` to manually check at any time.
+:::
+
+---
+
+## Step 1: Generate Your Configuration
+
+LoKO creates a smart default configuration for you:
+
+```bash
+loko config generate
+```
+
+**What this does**:
+- Auto-detects your local IP
+- Creates `loko.yaml` with sensible defaults
+- Sets up domain: `dev.me` (works out of the box)
+
+:::tip[Want to regenerate config?]
+```bash
+loko config generate --force
+```
+Overwrites existing `loko.yaml` with fresh defaults.
+:::
+
+---
+
+## Step 2: Add PostgreSQL
+
+Let's add a database before creating the cluster:
+
+```bash
+loko workloads add postgres
+```
+
+This updates `loko.yaml` to include PostgreSQL with pgAdmin.
+
+**Edit if needed**: Open `loko.yaml` and customize settings like storage size, passwords, or worker node count.
+
+---
+
+## Step 3: Create Everything
+
+One command creates the entire environment:
+
+```bash
+loko env create
+```
+
+**What happens automatically**:
+
+1. 🌐 **DNS resolution** - CoreDNS configured for `*.dev.me`
+2. 🔒 **TLS certificates** - Wildcard cert generated and trusted
+3. ☸️ **Kubernetes cluster** - Multi-node Kind cluster created
+4. 📦 **Container registry** - Local OCI registry deployed
+5. 🔌 **Intelligent routing** - Traefik ingress + TCP routing configured
+6. 🗄️ **PostgreSQL deployed** - Database + pgAdmin running
+
+**First time?** This takes ~3-5 minutes (downloading images). Subsequent runs are much faster.
+
+---
+
+## Step 4: Verify Everything Works
+
+Check cluster status:
+
+```bash
+loko status
+```
+
+**Expected output**:
+```
+╭─────────────────────────── Cluster Status ────────────────────────────╮
+│ Cluster: dev-mac                                                      │
+│ Provider: kind                                                        │
+│ Status: ✓ Running                                                     │
+╰───────────────────────────────────────────────────────────────────────╯
+
+╭─────────────────────────── Node Status ───────────────────────────────╮
+│ NAME                     ROLE           STATUS   AGE                  │
+│ dev-mac-control-plane    control-plane  Ready    3m                   │
+│ dev-mac-worker           worker         Ready    3m                   │
+╰───────────────────────────────────────────────────────────────────────╯
+```
+
+List your workloads:
+
+```bash
+loko workloads list
+```
+
+**Expected output**:
+```
+╭─────────────────────────── Workloads ─────────────────────────────╮
+│ NAME      STATUS    DNS                      PORTS                │
+│ postgres  Running   postgres.dev.me          5432                 │
+│ pgadmin   Running   postgres-ui.dev.me           443                  │
+╰───────────────────────────────────────────────────────────────────╯
+```
+
+---
+
+## Step 5: Access PostgreSQL
+
+### Option 1: Direct Connection (Recommended)
+
+```bash
+psql -h postgres.dev.me -U postgres
+```
+
+**That's it.** DNS resolves, port routing works, you're connected.
+
+### Option 2: Web UI
+
+Open your browser:
+```
+https://postgres-ui.dev.me
+```
+
+**No certificate warnings** - mkcert already installed the CA.
+
+Get credentials:
+
+```bash
+loko secrets show
+```
+
+**Output**:
+```json
+{
+  "postgres": {
+    "password": "auto-generated-secure-password"
+  },
+  "pgadmin": {
+    "email": "admin@dev.me",
+    "password": "another-auto-generated-password"
+  }
+}
+```
+
+---
+
+## Step 6: Deploy Your Own App
+
+Let's deploy a simple web app that uses PostgreSQL.
+
+### Build and Push to Local Registry
+
+```bash
+# Build your app
+docker build -t cr.dev.me/myapp:latest .
+
+# Push to local registry (no Docker Hub needed!)
+docker push cr.dev.me/myapp:latest
+```
+
+### Deploy to Kubernetes
+
+Create `deployment.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: cr.dev.me/myapp:latest
+        env:
+        - name: DATABASE_URL
+          value: "postgres://postgres:PASSWORD@postgres.dev.me:5432/mydb"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  selector:
+    app: myapp
+  ports:
+  - port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp
+spec:
+  rules:
+  - host: myapp.dev.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp
+            port:
+              number: 8080
+```
+
+Deploy it:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+**Access your app**:
+```
+https://myapp.dev.me
+```
+
+✅ **HTTPS works**
+✅ **DNS resolves**
+✅ **App connects to PostgreSQL**
+✅ **Exactly like production**
+
+---
+
+## Real Developer Workflow Example
+
+Here's a typical development session:
+
+```bash
+# Morning: Start your cluster
+loko env create
+
+# Add a cache
+loko workloads add redis
+loko workloads deploy redis
+
+# Build and test your app
+docker build -t cr.dev.me/api:v2 .
+docker push cr.dev.me/api:v2
+kubectl set image deployment/myapp myapp=cr.dev.me/api:v2
+
+# Check logs
+kubectl logs -f deployment/myapp
+
+# Connect to database for debugging
+psql -h postgres.dev.me -U postgres
+
+# Evening: Stop cluster (keeps all data)
+loko env stop
+```
+
+---
+
+## Managing Your Environment
+
+### Stop (Preserves Data)
+
+```bash
+loko env stop
+```
+
+Stops all containers but keeps persistent volumes.
+
+### Start (After Stopping)
+
+```bash
+loko env start
+```
+
+Restarts your cluster with all data intact.
+
+### Destroy (Removes Cluster)
+
+```bash
+loko env destroy
+```
+
+Deletes cluster but keeps `loko.yaml` and generated configs.
+
+### Clean (Complete Reset)
+
+```bash
+loko env clean
+```
+
+Removes everything: cluster, DNS, certificates, generated files.
+
+---
+
+## Add More Workloads
+
+LoKO has **pre-configured workloads**. Add what you need:
+
+```bash
+# Databases
+loko workloads add mysql mongodb
+
+# Cache (Redis-compatible)
+loko workloads add valkey
+
+# Messaging
+loko workloads add rabbitmq nats redpanda
+
+# Storage (S3-compatible)
+loko workloads add garage
+
+# DevOps/GitOps
+loko workloads add forgejo argocd flux-operator
+
+# Collaboration
+loko workloads add excalidraw
+
+# DevTools
+loko workloads add mock-smtp-sms
+
+# Deploy all enabled workloads
+loko workloads deploy --all
+```
+
+Each workload includes:
+- ✅ DNS configuration
+- ✅ Auto-generated passwords
+- ✅ Health checks
+- ✅ Web UI tools (where applicable)
+- ✅ TCP port routing
+
+**See all available workloads**: [Workload Catalog](../catalog/workloads)
+
+---
+
+## Common Commands
+
+| What You Want | Command |
+|---------------|---------|
+| Check if cluster is running | `loko status` |
+| List all workloads | `loko workloads list` |
+| Deploy a workload | `loko workloads deploy <name>` |
+| View workload logs | `loko logs workload <name>` |
+| Get connection info | `loko secrets show` |
+| Validate configuration | `loko config validate` |
+| Stop cluster | `loko env stop` |
+| Start cluster | `loko env start` |
+| Destroy cluster | `loko env destroy` |
+
+---
+
+## Troubleshooting
+
+### "postgres.dev.me" Doesn't Resolve
+
+**Check DNS**:
+```bash
+loko check dns
+```
+
+**macOS**: DNS should auto-configure via `/etc/resolver/`
+**Linux**: Should use systemd-resolved
+
+**Fix**:
+```bash
+loko dns recreate
+```
+
+---
+
+### "Cannot connect to Docker daemon"
+
+**macOS**:
+```bash
+open -a Docker
+# Wait for Docker Desktop to start
+```
+
+**Linux**:
+```bash
+sudo systemctl start docker
+```
+
+---
+
+### "Port already in use"
+
+LoKO uses ports 80 and 443 (Traefik). DNS runs in-cluster via an auto-selected NodePort — no host port required.
+
+**Check what's using HTTP/HTTPS ports**:
+```bash
+lsof -i :80
+lsof -i :443
+```
+
+**Kill conflicting processes** (e.g. Apache, Nginx) before running `loko env create`.
+
+---
+
+### Still Stuck?
+
+See [Troubleshooting Guide](../reference/troubleshooting) or [open an issue](https://github.com/getloko/loko/issues).
+
+---
+
+## What Makes This Different?
+
+Coming from other tools? Here's why LoKO feels magical:
+
+### vs Docker Compose
+- ✅ **Real Kubernetes** - Test Helm charts, Ingress, NetworkPolicies
+- ✅ **Multi-node clusters** - Test pod scheduling and affinity
+- ✅ **Production parity** - Behaves like real K8s
+
+### vs Minikube
+- ✅ **Faster** - No VM overhead (on Linux/Docker Desktop)
+- ✅ **Multi-node** - Minikube is single-node only
+- ✅ **Better networking** - Direct container access
+
+### vs Bare Kind
+- ✅ **DNS auto-configured** - No `/etc/hosts` hacking
+- ✅ **TLS included** - No certificate warnings
+- ✅ **Container registry** - No Docker Hub needed
+- ✅ **Workload catalog** - Pre-configured services
+- ✅ **TCP routing** - Direct database access from host
+
+**LoKO uses Kind** under the hood, but adds all the batteries you need.
+
+---
+
+## Next Steps
+
+
+<CardGrid>
+  <Card title="Explore Workloads" icon="database">
+    Add databases, caches, messaging, storage, and more
+
+    [Learn more →](/user-guide/workload-management/)
+  </Card>
+
+  <Card title="Customize Configuration" icon="setting">
+    Multi-node clusters, custom domains, advanced networking
+
+    [Learn more →](/user-guide/configuration/)
+  </Card>
+
+  <Card title="Use the Registry" icon="seti:docker">
+    Push images, Helm charts, and OCI artifacts
+
+    [Learn more →](/user-guide/registry/)
+  </Card>
+
+  <Card title="See Comparisons" icon="information">
+    Deep dive into LoKO vs alternatives
+
+    [Learn more →](/comparisons/)
+  </Card>
+</CardGrid>
+
+---
+
+**Ready to dive deeper?** [Understand the architecture →](../architecture/index)

@@ -1,0 +1,14 @@
+/* Custom CSS for LoKO Documentation */
+
+:root {
+	--sl-color-accent-low: #3f51b5;
+	--sl-color-accent: #5c6bc0;
+	--sl-color-accent-high: #7986cb;
+	--sl-hue-accent: 231;
+}
+
+[data-theme='dark'] {
+	--sl-color-accent-low: #5c6bc0;
+	--sl-color-accent: #7986cb;
+	--sl-color-accent-high: #9fa8da;
+}
