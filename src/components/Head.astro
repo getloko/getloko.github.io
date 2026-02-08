@@ -1,0 +1,170 @@
+---
+// Custom Head component to add Mermaid zoom functionality
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Head.astro';
+---
+
+<Default {...Astro.props}><slot /></Default>
+
+<script is:inline>
+  // Attach zoom + full-screen controls to a rendered pre.mermaid element.
+  // Called after astro-mermaid sets data-processed="true" and injects the SVG.
+  function setupMermaidDiagram(pre) {
+    const svg = pre.querySelector('svg');
+    if (!svg || pre.dataset.zoomSetup) return;
+    pre.dataset.zoomSetup = 'true';
+
+    // Click-to-zoom modal
+    svg.style.cursor = 'zoom-in';
+    svg.addEventListener('click', () => {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        cursor: zoom-out;
+      `;
+      const clonedSvg = svg.cloneNode(true);
+      clonedSvg.style.cssText = `max-width:95vw;max-height:95vh;width:auto;height:auto;cursor:zoom-out;`;
+      overlay.appendChild(clonedSvg);
+      document.body.appendChild(overlay);
+      const close = () => document.body.removeChild(overlay);
+      overlay.addEventListener('click', close);
+      const onKey = (e) => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); } };
+      document.addEventListener('keydown', onKey);
+    });
+
+    // "Open full screen" link injected after the <pre>
+    const linkContainer = document.createElement('div');
+    linkContainer.style.cssText = 'text-align:right;margin-top:0.25rem;margin-bottom:0.5rem;';
+
+    const link = document.createElement('a');
+    link.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Open full screen`;
+    link.title = 'Open diagram as full-screen SVG in new tab';
+    link.style.cssText = 'font-size:0.72rem;opacity:0.55;cursor:pointer;text-decoration:none;color:inherit;transition:opacity 0.15s;';
+    link.addEventListener('mouseenter', () => { link.style.opacity = '1'; });
+    link.addEventListener('mouseleave', () => { link.style.opacity = '0.55'; });
+    link.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Parse title from mermaid front matter stored in data-diagram attribute.
+      // astro-mermaid saves the raw diagram source there before rendering.
+      let title = 'Diagram';
+      const src = pre.getAttribute('data-diagram') || '';
+      const t = src.match(/^%%\s*title:\s*(.+?)\s*%%/m);
+      if (t) title = t[1].trim();
+
+      // Read natural dimensions from the live SVG before cloning
+      const nw = svg.viewBox.baseVal.width || parseFloat(svg.getAttribute('width')) || svg.getBoundingClientRect().width || 800;
+      const nh = svg.viewBox.baseVal.height || parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height || 600;
+
+      const cloned = svg.cloneNode(true);
+      cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      cloned.setAttribute('width', nw);
+      cloned.setAttribute('height', nh);
+      const svgMarkup = new XMLSerializer().serializeToString(cloned);
+
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#fff}
+  #wrap{position:absolute;top:0;left:0;transform-origin:0 0;cursor:grab;user-select:none}
+  #wrap.dragging{cursor:grabbing}
+  #wrap svg{display:block}
+  #hint{position:fixed;bottom:.75rem;left:50%;transform:translateX(-50%);font:0.72rem/1 sans-serif;color:rgba(0,0,0,.35);pointer-events:none;white-space:nowrap}
+  #resetbtn{position:fixed;top:.75rem;right:.75rem;font:0.72rem/1 sans-serif;color:rgba(0,0,0,.5);background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.15);border-radius:4px;padding:.3rem .6rem;cursor:pointer}
+  #resetbtn:hover{color:#000;background:rgba(0,0,0,.12)}
+</style>
+</head>
+<body>
+<div id="wrap">${svgMarkup}</div>
+<div id="hint">Scroll to zoom &nbsp;·&nbsp; Drag to pan &nbsp;·&nbsp; Double-click to reset</div>
+<button id="resetbtn">Reset</button>
+<script>
+  var wrap = document.getElementById('wrap');
+  var NW = ${nw}, NH = ${nh};
+  var scale = 1, tx = 0, ty = 0;
+
+  function apply() {
+    wrap.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+scale+')';
+  }
+  function fit() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    scale = Math.min(vw / NW, vh / NH) * 0.92;
+    tx = (vw - NW * scale) / 2;
+    ty = (vh - NH * scale) / 2;
+    apply();
+  }
+
+  window.addEventListener('load', fit);
+  window.addEventListener('resize', fit);
+
+  window.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var f = e.deltaY < 0 ? 1.12 : 1/1.12;
+    tx = e.clientX - (e.clientX - tx) * f;
+    ty = e.clientY - (e.clientY - ty) * f;
+    scale *= f;
+    apply();
+  }, { passive: false });
+
+  var drag=false, px, py, ptx, pty;
+  window.addEventListener('mousedown', function(e) {
+    drag=true; px=e.clientX; py=e.clientY; ptx=tx; pty=ty;
+    wrap.classList.add('dragging');
+  });
+  window.addEventListener('mousemove', function(e) {
+    if (!drag) return;
+    tx = ptx + e.clientX - px;
+    ty = pty + e.clientY - py;
+    apply();
+  });
+  window.addEventListener('mouseup', function() { drag=false; wrap.classList.remove('dragging'); });
+
+  window.addEventListener('dblclick', fit);
+  document.getElementById('resetbtn').addEventListener('click', fit);
+<\/script>
+</body>
+</html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    });
+
+    linkContainer.appendChild(link);
+    pre.insertAdjacentElement('afterend', linkContainer);
+  }
+
+  // Watch a pre.mermaid for the data-processed attribute that astro-mermaid
+  // sets once the SVG has been injected.
+  function observePre(pre) {
+    if (pre.hasAttribute('data-processed')) {
+      setupMermaidDiagram(pre);
+      return;
+    }
+    const obs = new MutationObserver(() => {
+      if (pre.hasAttribute('data-processed')) {
+        obs.disconnect();
+        setupMermaidDiagram(pre);
+      }
+    });
+    obs.observe(pre, { attributes: true, attributeFilter: ['data-processed'] });
+  }
+
+  function attachToAllDiagrams() {
+    document.querySelectorAll('pre.mermaid').forEach(observePre);
+  }
+
+  document.addEventListener('DOMContentLoaded', attachToAllDiagrams);
+  // Re-attach after Astro view transitions swap in new content
+  document.addEventListener('astro:after-swap', attachToAllDiagrams);
+</script>

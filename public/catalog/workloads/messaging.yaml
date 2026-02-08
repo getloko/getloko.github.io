@@ -1,0 +1,451 @@
+# Messaging & Streaming Workloads
+
+workloads:
+  rabbitmq:
+    category: messaging
+    description: RabbitMQ message broker with management UI
+    chart:
+      repo: groundhog2k
+      name: groundhog2k/rabbitmq
+      # renovate: datasource=helm depName=rabbitmq repositoryUrl=https://groundhog2k.github.io/helm-charts
+      version: "2.2.4"
+    defaults:
+      namespace: loko-workloads
+      ports: [5672]
+      storage:
+        size: 2Gi
+    mappings:
+      storage: storage.requestedSize
+      secrets.admin.username: authentication.user.value
+      secrets.admin.password: authentication.password.value  # pragma: allowlist secret
+      secrets.admin.erlang-cookie: authentication.erlangCookie.value
+    secrets:
+      admin:
+        name: admin
+        type: multi-field
+        description: Admin credentials and cluster cookie
+        fields:
+          - name: username
+            type: static
+            value: admin
+            sensitive: false
+          - name: password
+            type: password
+            length: 16
+          - name: erlang-cookie
+            type: token
+            length: 32
+            storage-key: erlang_cookie
+        mappings:
+          username: authentication.user.value
+          password: authentication.password.value  # pragma: allowlist secret
+          erlang-cookie: authentication.erlangCookie.value
+    endpoints:
+      - name: amqp
+        protocol: tcp
+        port: 5672
+        description: AMQP message broker
+      - name: management
+        protocol: https
+        port: 15672
+        description: Management UI
+    connection-strings:
+      - name: amqp
+        template: "amqp://${USER}:${PASS}@${HOST}:5672/${VHOST}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: amqp
+        description: Check if AMQP port is open
+      - name: api
+        type: http
+        tier: client
+        target: management
+        path: /api/health/checks/alarms
+        description: Check management API health
+    # Base presets with management enabled by default
+    presets:
+      service:
+        <<: *service-clusterip
+      # Management plugin enabled by default
+      managementPlugin:
+        enabled: true
+      ingress:
+        enabled: true
+        hostname: rabbitmq.${LOKO_DOMAIN}
+        className: traefik
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        tls:
+          - hosts:
+              - rabbitmq.${LOKO_DOMAIN}
+
+  nats:
+    category: messaging
+    description: NATS messaging system with JetStream
+    chart:
+      repo: nats
+      name: nats/nats
+      # renovate: datasource=helm depName=nats repositoryUrl=https://nats-io.github.io/k8s/helm/charts
+      version: "2.12.4"
+    defaults:
+      namespace: loko-workloads
+      ports: [4222, 8222]
+      storage:
+        size: 1Gi
+    mappings:
+      storage: config.jetstream.fileStore.pvc.size
+    secrets: {}  # No authentication by default
+    endpoints:
+      - name: client
+        protocol: tcp
+        port: 4222
+        description: NATS client connections
+      - name: monitor
+        protocol: https
+        port: 8222
+        description: Monitoring HTTP endpoint
+    connection-strings:
+      - name: default
+        template: "nats://${HOST}:4222"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: client
+        description: Check if NATS port is open
+      - name: ping
+        type: command
+        tier: client
+        image: natsio/nats-box:latest
+        command: ["nats", "server", "ping", "-s", "nats://${HOST}:4222"]
+        requires: ["nats"]
+        description: Ping NATS server
+    links:
+      - type: addon
+        target: nats-ui
+        auto-deploy: false
+        required: false
+        lifecycle-binding: true
+        config-template:
+          configMaps:
+            config:
+              data:
+                config.json: '{"servers":[{"name":"NATS","url":"https://{{ parent.name }}.${LOKO_DOMAIN}"}]}'
+    presets:
+      # Enable monitoring HTTP endpoint
+      config:
+        monitor:
+          enabled: true
+          port: 8222
+      service:
+        enabled: true
+        ports:
+          monitor:
+            enabled: true
+      # Expose monitoring endpoint via ingress for nats-dashboard access
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: nats.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - hosts:
+                - nats.${LOKO_DOMAIN}
+
+  redpanda:
+    category: messaging
+    description: Kafka-compatible streaming platform
+    chart:
+      repo: redpanda
+      name: redpanda/redpanda
+      # renovate: datasource=helm depName=redpanda repositoryUrl=https://charts.redpanda.com
+      version: "25.3.2"
+    defaults:
+      namespace: loko-workloads
+      ports: [9092]
+      storage:
+        size: 5Gi
+    mappings:
+      storage: storage.persistentVolume.size
+    secrets: {}  # No authentication by default (optional SASL)
+    endpoints:
+      - name: kafka
+        protocol: tcp
+        port: 9092
+        description: Kafka-compatible client connections
+      - name: kafka-internal
+        protocol: tcp
+        port: 9093
+        description: Internal Kafka connections
+      - name: schema-registry
+        protocol: https
+        port: 8081
+        description: Schema Registry API
+      - name: http-proxy
+        protocol: https
+        port: 8082
+        description: REST proxy for Kafka
+      - name: admin
+        protocol: https
+        port: 9644
+        description: Admin API and metrics
+    connection-strings:
+      - name: kafka
+        template: "${HOST}:9092"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: kafka
+        description: Check if Kafka port is open
+      - name: ready
+        type: http
+        tier: client
+        target: admin
+        path: /v1/status/ready
+        description: Check readiness via Admin API
+    # Base presets with console enabled by default
+    presets:
+      statefulset:
+        replicas: 1
+      tls:
+        enabled: false
+      # Disable enterprise features to avoid 30-day trial
+      config:
+        cluster:
+          audit_enabled: false
+          cloud_storage_enabled: false
+          partition_autobalancing_mode: node_add
+      # Console enabled by default with ingress
+      console:
+        enabled: true
+        ingress:
+          enabled: true
+          hosts:
+            - host: redpanda-ui.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+          className: traefik
+          annotations:
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/router.tls: "true"
+          tls:
+            - hosts:
+                - redpanda-ui.${LOKO_DOMAIN}
+      listeners:
+        schemaRegistry:
+          enabled: true
+        http:
+          enabled: true
+      # Redpanda chart doesn't have built-in ingress support
+      # Using extraObjects to create ingress resources
+      extraObjects:
+        - apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: redpanda-schema
+            namespace: ${LOKO_SYSTEM_WORKLOADS_NAMESPACE}
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.tls: "true"
+          spec:
+            ingressClassName: traefik
+            rules:
+              - host: redpanda-schema.${LOKO_DOMAIN}
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: redpanda
+                          port:
+                            number: 8081
+        - apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: redpanda-proxy
+            namespace: ${LOKO_SYSTEM_WORKLOADS_NAMESPACE}
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.tls: "true"
+          spec:
+            ingressClassName: traefik
+            rules:
+              - host: redpanda-proxy.${LOKO_DOMAIN}
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: redpanda
+                          port:
+                            number: 8082
+        - apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: redpanda-admin
+            namespace: ${LOKO_SYSTEM_WORKLOADS_NAMESPACE}
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.tls: "true"
+          spec:
+            ingressClassName: traefik
+            rules:
+              - host: redpanda-admin.${LOKO_DOMAIN}
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: redpanda
+                          port:
+                            number: 9644
+  elasticmq:
+    category: messaging
+    description: In-memory message queue with Amazon SQS-compatible interface
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: [9324, 9325]
+      storage:
+        size: 1Gi
+    mappings:
+      storage: persistence.data.size
+    secrets: {}  # No authentication by default
+    presets:
+      controllers:
+        main:
+          type: statefulset
+          containers:
+            main:
+              image:
+                repository: softwaremill/elasticmq-native
+                # renovate: datasource=docker depName=softwaremill/elasticmq-native
+                tag: "1.6.15"
+              probes:
+                liveness:
+                  enabled: true
+                  custom: true
+                  spec:
+                    httpGet:
+                      path: /
+                      port: 9325
+                readiness:
+                  enabled: true
+                  custom: true
+                  spec:
+                    httpGet:
+                      path: /
+                      port: 9325
+      persistence:
+        data:
+          type: persistentVolumeClaim
+          accessMode: ReadWriteOnce
+          size: 1Gi
+          advancedMounts:
+            main:
+              main:
+                - path: /data
+      service:
+        main:
+          controller: main
+          ports:
+            http:
+              port: 9324
+            ui:
+              port: 9325
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: elasticmq.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: ui
+          tls:
+            - hosts:
+                - elasticmq.${LOKO_DOMAIN}
+    endpoints:
+      - name: api
+        protocol: tcp
+        port: 9324
+        description: SQS-compatible REST API
+      - name: ui
+        protocol: https
+        port: 9325
+        description: Built-in web UI for queue monitoring
+    connection-strings:
+      - name: sqs-endpoint
+        template: "http://${HOST}:9324"
+      - name: web-ui
+        template: "https://${HOST}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: api
+        description: Check if ElasticMQ API port is open
+      - name: ui
+        type: http
+        tier: client
+        target: ui
+        path: /
+        description: Check if web UI is accessible
+  nats-ui:
+    category: ui
+    description: Web UI for NATS monitoring (nats-dashboard)
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: []  # Uses HTTP ingress, no TCP tunnel needed
+    presets:
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: mdawar/nats-dashboard
+                # renovate: datasource=docker depName=mdawar/nats-dashboard
+                tag: "v0.3.1"
+      configMaps:
+        config:
+          data:
+            # Pre-configure NATS server URL (served at /config.json)
+            config.json: '{"servers":[{"name":"NATS","url":"https://nats.${LOKO_DOMAIN}"}]}'
+      persistence:
+        config:
+          type: configMap
+          identifier: config
+          advancedMounts:
+            main:
+              main:
+                - path: /srv/config.json
+                  subPath: config.json
+                  readOnly: true
+      service:
+        <<: *ui-service-http-80
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: nats-ui.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
+          tls:
+            - hosts:
+                - nats-ui.${LOKO_DOMAIN}

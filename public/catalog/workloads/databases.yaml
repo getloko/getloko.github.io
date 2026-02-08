@@ -1,0 +1,495 @@
+# Database Workloads
+workloads:
+  mysql:
+    category: database
+    description: MySQL database server
+    chart:
+      repo: groundhog2k
+      name: groundhog2k/mysql
+      # renovate: datasource=helm depName=mysql repositoryUrl=https://groundhog2k.github.io/helm-charts
+      version: "3.0.8"
+    defaults:
+      namespace: loko-workloads
+      ports: [3306]
+      storage:
+        size: 10Gi
+    mappings:
+      storage: storage.requestedSize
+      secrets.admin.password: settings.rootPassword.value  # pragma: allowlist secret
+    secrets:
+      admin:
+        name: admin
+        type: user-pass
+        description: Root user credentials
+        fields:
+          - name: username
+            type: static
+            value: root
+            sensitive: false
+          - name: password
+            type: password
+            length: 16
+        mappings:
+          password: settings.rootPassword.value  # pragma: allowlist secret
+    presets:
+      service:
+        <<: *service-clusterip
+    endpoints:
+      - name: client
+        protocol: tcp
+        port: 3306
+        description: MySQL client connections
+    connection-strings:
+      - name: default
+        template: "mysql://${USER}:${PASS}@${HOST}:3306/${DB}"
+      - name: jdbc
+        template: "jdbc:mysql://${HOST}:3306/${DB}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: client
+        description: Check if MySQL port is open
+      - name: query
+        type: command
+        tier: client
+        image: mysql:8.0
+        command: ["mysql", "-h", "${HOST}", "-u", "${USER}", "-p${PASS}", "-e", "SELECT 1"]
+        requires: ["mysql"]
+        description: Execute test query
+    links:
+      - type: addon
+        target: mysql-ui
+        auto-deploy: false
+        required: false
+        lifecycle-binding: true
+        config-template:
+          controllers:
+            main:
+              containers:
+                main:
+                  env:
+                    PMA_HOST: "{{ parent.service_dns }}"
+
+  postgres:
+    category: database
+    description: PostgreSQL database server
+    chart:
+      repo: groundhog2k
+      name: groundhog2k/postgres
+      # renovate: datasource=helm depName=postgres repositoryUrl=https://groundhog2k.github.io/helm-charts
+      version: "1.6.1"
+    defaults:
+      namespace: loko-workloads
+      ports: [5432]
+      storage:
+        size: 5Gi
+    mappings:
+      storage: storage.requestedSize
+      secrets.admin.password: settings.superuserPassword.value  # pragma: allowlist secret
+    secrets:
+      admin:
+        name: admin
+        type: user-pass
+        description: Superuser credentials
+        fields:
+          - name: username
+            type: static
+            value: postgres
+            sensitive: false
+          - name: password
+            type: password
+            length: 16
+        mappings:
+          password: settings.superuserPassword.value  # pragma: allowlist secret
+    presets:
+      service:
+        <<: *service-clusterip
+    endpoints:
+      - name: client
+        protocol: tcp
+        port: 5432
+        description: PostgreSQL client connections
+    connection-strings:
+      - name: default
+        template: "postgresql://${USER}:${PASS}@${HOST}:5432/${DB}"
+      - name: jdbc
+        template: "jdbc:postgresql://${HOST}:5432/${DB}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: client
+        description: Check if PostgreSQL port is open
+      - name: query
+        type: command
+        tier: client
+        image: postgres:alpine
+        command: ["psql", "-h", "${HOST}", "-U", "${USER}", "-c", "SELECT 1;"]
+        requires: ["psql"]
+        description: Execute test query
+    links:
+      - type: addon
+        target: postgres-ui
+        auto-deploy: false
+        required: false
+        lifecycle-binding: true
+        config-template:
+          secrets:
+            pgadmin-config:
+              stringData:
+                servers.json: '{"Servers":{"1":{"Name":"PostgreSQL","Group":"Servers","Host":"{{ parent.service_dns }}","Port":5432,"MaintenanceDB":"postgres","Username":"postgres","SSLMode":"prefer","Password":"PGPASS_PLACEHOLDER","SavePassword":true}}}'  # pragma: allowlist secret
+
+  mongodb:
+    category: database
+    description: MongoDB document database
+    chart:
+      repo: groundhog2k
+      name: groundhog2k/mongodb
+      # renovate: datasource=helm depName=mongodb repositoryUrl=https://groundhog2k.github.io/helm-charts
+      version: "0.7.7"
+    defaults:
+      namespace: loko-workloads
+      ports: [27017]
+      storage:
+        size: 5Gi
+    mappings:
+      storage: storage.requestedSize
+      secrets.admin.username: settings.rootUsername
+      secrets.admin.password: settings.rootPassword  # pragma: allowlist secret
+    secrets:
+      admin:
+        name: admin
+        type: user-pass
+        description: Root user credentials
+        fields:
+          - name: username
+            type: static
+            value: root
+            sensitive: false
+          - name: password
+            type: password
+            length: 16
+        mappings:
+          username: settings.rootUsername
+          password: settings.rootPassword  # pragma: allowlist secret
+    presets:
+      service:
+        <<: *service-clusterip
+    endpoints:
+      - name: client
+        protocol: tcp
+        port: 27017
+        description: MongoDB client connections
+    connection-strings:
+      - name: default
+        template: "mongodb://${USER}:${PASS}@${HOST}:27017/${DB}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: client
+        description: Check if MongoDB port is open
+      - name: ping
+        type: command
+        tier: client
+        image: mongo:8
+        command: ["mongosh", "--host", "${HOST}", "-u", "${USER}", "-p", "${PASS}", "--eval", "db.runCommand({ping:1})"]
+        requires: ["mongosh"]
+        description: Execute ping command
+    links:
+      - type: addon
+        target: mongodb-ui
+        auto-deploy: false
+        required: false
+        lifecycle-binding: true
+        config-template:
+          mongodbServer: "{{ parent.service_dns }}"
+  mysql-ui:
+    category: ui
+    description: Web UI for MySQL/MariaDB management (phpMyAdmin)
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: []  # Uses HTTP ingress, no TCP tunnel needed
+    presets:
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: phpmyadmin/phpmyadmin
+                # renovate: datasource=docker depName=phpmyadmin/phpmyadmin
+                tag: "5.2.3"
+              env:
+                PMA_PORT: "3306"
+                PMA_USER: root
+                PMA_HOST: "mysql.${LOKO_SYSTEM_WORKLOADS_NAMESPACE}.svc.cluster.local"
+                PMA_PASSWORD:
+                  valueFrom:
+                    secretKeyRef:
+                      name: mysql
+                      key: MYSQL_ROOT_PASSWORD
+      service:
+        <<: *ui-service-http-80
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: mysql-ui.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
+          tls:
+            - hosts:
+                - mysql-ui.${LOKO_DOMAIN}
+
+  postgres-ui:
+    category: ui
+    description: Web UI for PostgreSQL management (pgAdmin)
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: []  # Uses HTTP ingress, no TCP tunnel needed
+    presets:
+      # Pod-level security context for volume permissions
+      defaultPodOptions:
+        securityContext:
+          fsGroup: 5050  # pgAdmin group - allows reading mounted secrets
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: dpage/pgadmin4
+                # renovate: datasource=docker depName=dpage/pgadmin4
+                tag: "9.12.0"
+              env:
+                PGADMIN_DEFAULT_EMAIL: admin@local.dev
+                PGADMIN_DEFAULT_PASSWORD: admin  # pragma: allowlist secret
+                PGADMIN_CONFIG_SERVER_MODE: 'False'
+                PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'  # pragma: allowlist secret
+                PGADMIN_CONFIG_ALLOW_SAVE_PASSWORD: 'True'  # pragma: allowlist secret
+              securityContext:
+                runAsUser: 5050
+                runAsGroup: 5050
+      # servers.json - pre-configures PostgreSQL connection
+      # Password placeholder is replaced by credential_injection plugin
+      secrets:
+        pgadmin-config:
+          stringData:
+            # yamllint disable-line rule:line-length
+            servers.json: '{"Servers":{"1":{"Name":"PostgreSQL","Group":"Servers","Host":"postgres.${LOKO_SYSTEM_WORKLOADS_NAMESPACE}.svc.cluster.local","Port":5432,"MaintenanceDB":"postgres","Username":"postgres","SSLMode":"prefer","Password":"PGPASS_PLACEHOLDER","SavePassword":true}}}'  # pragma: allowlist secret
+      persistence:
+        data:
+          type: persistentVolumeClaim
+          accessMode: ReadWriteOnce
+          size: 1Gi
+          advancedMounts:
+            main:
+              main:
+                - path: /var/lib/pgadmin
+        servers-config:
+          type: secret
+          identifier: pgadmin-config
+          advancedMounts:
+            main:
+              main:
+                - path: /pgadmin4/servers.json
+                  subPath: servers.json
+                  readOnly: true
+      service:
+        <<: *ui-service-http-80
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: postgres-ui.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
+          tls:
+            - hosts:
+                - postgres-ui.${LOKO_DOMAIN}
+
+  mongodb-ui:
+    category: ui
+    description: Web UI for MongoDB management (mongo-express)
+    chart:
+      repo: cowboysysop
+      name: cowboysysop/mongo-express
+      # renovate: datasource=helm depName=mongo-express repositoryUrl=https://cowboysysop.github.io/charts
+      version: "7.0.0"
+    defaults:
+      namespace: loko-workloads
+      ports: []  # Uses HTTP ingress, no TCP tunnel needed
+    dependencies:
+      - workload: mongodb
+        optional: false
+        reason: "Requires MongoDB credentials for database connection"
+    presets:
+      mongodbServer: "mongodb.${LOKO_SYSTEM_WORKLOADS_NAMESPACE}.svc.cluster.local"
+      mongodbEnableAdmin: true
+      mongodbAdminUsername: root
+      mongodbAdminPassword:
+        valueFrom:
+          secretKeyRef:
+            name: mongodb
+            key: MONGODB_ROOT_PASSWORD
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        hosts:
+          - host: mongodb-ui.${LOKO_DOMAIN}
+            paths:
+              - /
+        tls:
+          - hosts:
+              - mongodb-ui.${LOKO_DOMAIN}
+
+  dynamodb-local:
+    category: database
+    description: Local DynamoDB for development and testing (AWS-compatible NoSQL)
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: [8000]
+      storage:
+        size: 2Gi
+    mappings:
+      storage: persistence.data.size
+    secrets: {}  # No authentication by default (uses static credentials)
+    presets:
+      controllers:
+        main:
+          type: statefulset
+          containers:
+            main:
+              image:
+                repository: amazon/dynamodb-local
+                # renovate: datasource=docker depName=amazon/dynamodb-local
+                tag: "3.3.0"
+              args:
+                - "-jar"
+                - "DynamoDBLocal.jar"
+                - "-sharedDb"
+                - "-dbPath"
+                - "/data"
+              probes:
+                liveness:
+                  enabled: true
+                  custom: true
+                  spec:
+                    tcpSocket:
+                      port: 8000
+                    initialDelaySeconds: 10
+                    periodSeconds: 10
+                readiness:
+                  enabled: true
+                  custom: true
+                  spec:
+                    tcpSocket:
+                      port: 8000
+                    initialDelaySeconds: 5
+                    periodSeconds: 5
+      persistence:
+        data:
+          type: persistentVolumeClaim
+          accessMode: ReadWriteOnce
+          size: 2Gi
+          advancedMounts:
+            main:
+              main:
+                - path: /data
+      service:
+        main:
+          controller: main
+          ports:
+            http:
+              port: 8000
+    endpoints:
+      - name: api
+        protocol: tcp
+        port: 8000
+        description: DynamoDB-compatible API endpoint
+    connection-strings:
+      - name: endpoint
+        template: "http://${HOST}:8000"
+      - name: aws-cli
+        template: "aws dynamodb list-tables --endpoint-url http://${HOST}:8000 --region us-east-1"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: api
+        description: Check if DynamoDB Local port is open
+      - name: list-tables
+        type: command
+        tier: client
+        image: amazon/aws-cli:latest
+        command: ["dynamodb", "list-tables", "--endpoint-url", "http://${HOST}:8000", "--region", "us-east-1"]
+        description: List tables via AWS CLI
+    links:
+      - type: addon
+        target: dynamodb-ui
+        auto-deploy: false
+        required: false
+        lifecycle-binding: true
+        config-template:
+          controllers:
+            main:
+              containers:
+                main:
+                  env:
+                    DYNAMO_ENDPOINT: "http://{{ parent.service_dns }}:8000"
+
+  dynamodb-ui:
+    category: ui
+    description: Web UI for DynamoDB Local management (dynamodb-admin)
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: []  # Uses HTTP ingress, no TCP tunnel needed
+    presets:
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: aaronshaf/dynamodb-admin
+                # renovate: datasource=docker depName=aaronshaf/dynamodb-admin
+                tag: "5.1.3"
+              env:
+                DYNAMO_ENDPOINT: "http://dynamodb-local.${LOKO_SYSTEM_WORKLOADS_NAMESPACE}.svc.cluster.local:8000"
+                AWS_REGION: "us-east-1"
+                AWS_ACCESS_KEY_ID: "local"  # pragma: allowlist secret
+                AWS_SECRET_ACCESS_KEY: "local"  # pragma: allowlist secret
+      service:
+        main:
+          controller: main
+          ports:
+            http:
+              port: 8001
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: dynamodb-ui.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
+          tls:
+            - hosts:
+                - dynamodb-ui.${LOKO_DOMAIN}

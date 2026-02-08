@@ -1,0 +1,33 @@
+# ============================================================================
+# Internal Components
+# Infrastructure managed by loko
+# ============================================================================
+components:
+  kubernetes:
+    api-port: 6443
+    image: kindest/node
+    # renovate: datasource=docker depName=kindest/node
+    tag: v1.35.0
+
+  ingress-controller:
+    # renovate: datasource=helm depName=traefik repositoryUrl=https://traefik.github.io/charts
+    version: "39.0.0"
+    repo-url: https://traefik.github.io/charts
+
+  registry:
+    # renovate: datasource=helm depName=zot repositoryUrl=http://zotregistry.dev/helm-charts
+    version: "0.1.98"
+    repo-url: http://zotregistry.dev/helm-charts
+
+  metrics-server:
+    # renovate: datasource=helm depName=metrics-server repositoryUrl=https://kubernetes-sigs.github.io/metrics-server
+    version: "3.13.0"
+    repo-url: https://kubernetes-sigs.github.io/metrics-server/
+
+  dnsmasq:
+    # renovate: datasource=docker depName=dockurr/dnsmasq
+    version: "2.92"
+
+  haproxy:
+    # renovate: datasource=docker depName=haproxy
+    version: "3.3.2"

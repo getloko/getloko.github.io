@@ -1,0 +1,57 @@
+# Collaboration & Productivity Workloads
+workloads:
+  excalidraw:
+    category: collaboration
+    description: Virtual collaborative whiteboard for sketching hand-drawn diagrams
+    chart:
+      repo: excalidraw
+      name: excalidraw/excalidraw
+      # renovate: datasource=helm depName=excalidraw repositoryUrl=https://pmoscode-helm.github.io/excalidraw
+      version: "0.18.0"
+    defaults:
+      namespace: loko-workloads
+      ports: [80]
+      storage:
+        size: 2Gi
+    mappings:
+      storage: persistence.size
+    presets:
+      service:
+        type: ClusterIP
+        port: 80
+      ingress:
+        enabled: true
+        <<: *ingress-traefik
+        className: traefik
+        hosts:
+          - host: excalidraw.${LOKO_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: excalidraw-tls  # pragma: allowlist secret
+            hosts:
+              - excalidraw.${LOKO_DOMAIN}
+      # Enable collaboration server for real-time collaboration
+      collabServer:
+        enabled: true
+        service:
+          type: ClusterIP
+          port: 3002
+    endpoints:
+      - name: web-ui
+        protocol: http
+        port: 80
+        description: Excalidraw web interface
+      - name: collab
+        protocol: http
+        port: 3002
+        description: Real-time collaboration server (WebSocket)
+    connection-strings:
+      - name: web-ui
+        template: "https://${HOST}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: web-ui
+        description: Check if Excalidraw web UI is accessible

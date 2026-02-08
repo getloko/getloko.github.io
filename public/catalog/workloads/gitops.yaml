@@ -1,0 +1,88 @@
+# GitOps Tools
+# Continuous delivery and deployment automation for Kubernetes
+workloads:
+  argocd:
+    category: gitops
+    description: GitOps continuous delivery tool for Kubernetes
+    chart:
+      repo: argo
+      name: argo/argo-cd
+      # renovate: datasource=helm depName=argo-cd repositoryUrl=https://argoproj.github.io/argo-helm
+      version: "9.4.1"
+    defaults:
+      namespace: loko-workloads
+      ports: [80, 443]
+      storage:
+        size: 5Gi
+    mappings:
+      storage: redis.master.persistence.size
+    presets:
+      # Basic configuration for ArgoCD server
+      global:
+        domain: argocd.${LOKO_DOMAIN}
+      server:
+        service:
+          type: ClusterIP
+        ingress:
+          <<: *ingress-traefik
+          enabled: true
+          hosts:
+            - argocd.${LOKO_DOMAIN}
+          tls:
+            - secretName: argocd-tls  # pragma: allowlist secret
+              hosts:
+                - argocd.${LOKO_DOMAIN}
+      # Use integrated Redis instead of HA Redis for local dev
+      redis-ha:
+        enabled: false
+    endpoints:
+      - name: web-ui
+        protocol: http
+        port: 80
+        description: ArgoCD web UI and API
+      - name: grpc
+        protocol: tcp
+        port: 443
+        description: ArgoCD gRPC server
+    connection-strings:
+      - name: web-ui
+        template: "https://${HOST}"
+      - name: grpc
+        template: "${HOST}:443"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: web-ui
+        description: Check if ArgoCD web UI port is open
+
+  flux-operator:
+    category: gitops
+    description: Kubernetes operator for managing Flux CD instances (GitOps on Autopilot)
+    chart:
+      repo: flux-operator
+      name: flux-operator/flux-operator
+      # renovate: datasource=helm depName=flux-operator repositoryUrl=oci://ghcr.io/controlplaneio-fluxcd/charts
+      version: "0.40.0"
+    defaults:
+      namespace: flux-system
+      storage:
+        size: 1Gi
+    mappings:
+      storage: persistence.size
+    presets:
+      # Install CRDs for FluxInstance management
+      installCRDs: true
+      # Operator watches all namespaces by default
+      watchAllNamespaces: true
+      # Resource limits for the operator
+      resources:
+        limits:
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+    endpoints:
+      - name: operator
+        protocol: http
+        port: 8080
+        description: Flux operator metrics and health

@@ -1,0 +1,52 @@
+# ============================================================================
+# Helm Repositories
+# ============================================================================
+helm-repositories:
+  # Component repos
+  - name: traefik
+    url: https://traefik.github.io/charts
+  - name: zot
+    url: http://zotregistry.dev/helm-charts
+  - name: metrics-server
+    url: https://kubernetes-sigs.github.io/metrics-server/
+
+  # Workload repos
+  - name: groundhog2k
+    url: https://groundhog2k.github.io/helm-charts/
+  - name: cloudpirates
+    url: https://cloudpirates-io.github.io/helm-charts/
+  - name: nats
+    url: https://nats-io.github.io/k8s/helm/charts/
+  - name: redpanda
+    url: https://charts.redpanda.com/
+  - name: datahub-local
+    url: https://datahub-local.github.io/garage-helm
+
+  # UI and utility workload repos
+  - name: bjw-s
+    url: https://bjw-s-labs.github.io/helm-charts/
+  - name: cowboysysop
+    url: https://cowboysysop.github.io/charts
+
+  # DevOps repos
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: forgejo-helm
+    url: code.forgejo.org/forgejo-helm
+    oci: true
+  - name: forgejo-runner
+    url: codeberg.org/wrenix/helm-charts
+    oci: true
+  - name: flux-operator
+    url: ghcr.io/controlplaneio-fluxcd/charts
+    oci: true
+
+  # Collaboration repos
+  - name: excalidraw
+    url: https://pmoscode-helm.github.io/excalidraw
+
+  # Example workload repos
+  - name: securecodebox
+    url: https://charts.securecodebox.io/
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts

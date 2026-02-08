@@ -1,0 +1,26 @@
+{
+  "name": "loko-docs",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.0",
+    "astro": "^7.3.2",
+    "astro-mermaid": "^2.1.0",
+    "sharp": "^0.35.4",
+    "starlight-image-zoom": "^0.16.0",
+    "starlight-links-validator": "^0.26.0",
+    "starlight-theme-galaxy": "^1.0.0",
+    "starlight-versions": "^0.10.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  }
+}

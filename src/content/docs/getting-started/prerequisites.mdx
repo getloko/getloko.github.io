@@ -1,0 +1,296 @@
+---
+title: "Prerequisites"
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+LoKO is a single self-contained binary — see the [Installation Guide](/getting-started/installation/).
+It has no runtime dependency of its own, but it drives several external tools
+that must be installed. This page explains each one.
+
+## Required Tools
+
+### Docker
+
+Container runtime for running Kind clusters.
+
+**Check version:**
+```bash
+docker --version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    Download [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop)
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -fsSL https://get.docker.com | sh
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
+  </TabItem>
+</Tabs>
+
+### Kind
+
+Kubernetes in Docker - creates local Kubernetes clusters.
+
+**Check version:**
+```bash
+kind --version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install kind
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+    chmod +x ./kind
+    sudo mv ./kind /usr/local/bin/kind
+    ```
+  </TabItem>
+</Tabs>
+
+### Helm
+
+Kubernetes package manager.
+
+**Check version:**
+```bash
+helm version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install helm
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    ```
+  </TabItem>
+</Tabs>
+
+### Helmfile
+
+Declarative Helm deployment tool.
+
+**Check version:**
+```bash
+helmfile version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install helmfile
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -L https://github.com/helmfile/helmfile/releases/latest/download/helmfile_linux_amd64 -o helmfile
+    chmod +x helmfile
+    sudo mv helmfile /usr/local/bin/
+    ```
+  </TabItem>
+</Tabs>
+
+### cfssl
+
+Certificate toolkit used by LoKO to generate its local CA and wildcard certificates.
+
+**Check version:**
+```bash
+cfssl version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install cfssl
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    # install cfssl from your distro packages or the official Cloudflare releases
+    ```
+  </TabItem>
+</Tabs>
+
+### Git
+
+Required for GitOps repository seeding and bootstrap flows.
+
+**Check version:**
+```bash
+git --version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install git
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    sudo apt install git
+    ```
+  </TabItem>
+</Tabs>
+
+### kubectl
+
+Kubernetes command-line tool.
+
+**Check version:**
+```bash
+kubectl version --client
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install kubectl
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/
+    ```
+  </TabItem>
+</Tabs>
+
+## Optional Tools
+
+### nss / libnss3-tools
+
+Required for Firefox/NSS trust installation.
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install nss
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    sudo apt install libnss3-tools
+    ```
+  </TabItem>
+</Tabs>
+
+### Mise (Recommended)
+
+Tool version manager LoKO can drive per-tool for missing prerequisites.
+
+```bash
+curl https://mise.run | sh
+```
+
+Then let LoKO install whatever's missing through it:
+
+```bash
+loko check prerequisites --install
+```
+
+### ngrok
+
+Required for `loko share` — exposes local workloads to the internet via a public ngrok URL.
+
+**Install**: [ngrok.com/download](https://ngrok.com/download)
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install ngrok/ngrok/ngrok
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+      && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list \
+      && sudo apt update && sudo apt install ngrok
+    ```
+  </TabItem>
+</Tabs>
+
+After installing, authenticate with your ngrok account:
+```bash
+ngrok config add-authtoken <your-token>
+```
+
+Get your token at [dashboard.ngrok.com](https://dashboard.ngrok.com).
+
+## Verification
+
+After installing all prerequisites, verify with:
+
+```bash
+loko check prerequisites
+```
+
+This checks for:
+- ✅ Docker (running)
+- ✅ kind (installed)
+- ✅ Helm (installed)
+- ✅ helmfile (installed)
+- ✅ cfssl (installed)
+- ✅ git (installed)
+- ✅ kubectl (installed)
+- ✅ ngrok (optional — required for `loko share`)
+
+## System Requirements
+
+**Minimum:**
+- 4 GB RAM
+- 2 CPU cores
+- 10 GB disk space
+
+**Recommended:**
+- 8 GB RAM
+- 4 CPU cores
+- 20 GB disk space
+
+## Port Requirements
+
+LoKO uses these ports by default:
+
+| Port | Service | Configurable |
+|------|---------|--------------|
+| 80 | HTTP (Traefik) | No |
+| 443 | HTTPS (Traefik) | No |
+| 6443 | Kubernetes API | Yes (`cluster.kubernetes.api-port`) |
+
+**Check port availability:**
+```bash
+loko config port-check
+```
+
+## Next Steps
+
+- [Installation Guide](/getting-started/installation/) - Install LoKO
+- [Quick Start](/getting-started/quick-start/) - Create your first cluster
