@@ -1,0 +1,26 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https://github.com/getloko/loko"
+    },
+    {
+      "pattern": "^https://raw.githubusercontent.com/getloko/loko"
+    },
+    {
+      "pattern": "^https://getloko.github.io/"
+    },
+    {
+      "comment": "Ignore relative links - Starlight handles these without .md extension",
+      "pattern": "^\\.\\./"
+    },
+    {
+      "comment": "Ignore same-directory relative links",
+      "pattern": "^[^/]+$"
+    }
+  ],
+  "timeout": "20s",
+  "retryOn429": true,
+  "retryCount": 2,
+  "fallbackRetryDelay": "30s",
+  "aliveStatusCodes": [200, 206, 403]
+}
