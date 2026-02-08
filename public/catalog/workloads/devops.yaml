@@ -1,0 +1,159 @@
+# DevOps & GitOps Workloads
+workloads:
+  forgejo:
+    category: devops
+    description: Self-hosted lightweight Git service (fork of Gitea)
+    chart:
+      repo: forgejo-helm
+      name: forgejo-helm/forgejo
+      # renovate: datasource=helm depName=forgejo repositoryUrl=oci://code.forgejo.org/forgejo-helm
+      version: "16.0.2"
+    defaults:
+      namespace: loko-workloads
+      ports: [3000]  # SSH disabled - use HTTPS for git operations
+      storage:
+        size: 10Gi
+    mappings:
+      storage: persistence.size
+      secrets.admin.username: gitea.admin.username
+      secrets.admin.password: gitea.admin.password  # pragma: allowlist secret
+    secrets:
+      admin:
+        name: admin
+        type: user-pass
+        description: Forgejo admin credentials
+        fields:
+          - name: username
+            type: static
+            value: forgejo
+            sensitive: false
+          - name: password
+            type: password
+            length: 16
+        mappings:
+          username: gitea.admin.username
+          password: gitea.admin.password  # pragma: allowlist secret
+    presets:
+      # Forgejo server configuration
+      gitea:
+        config:
+          server:
+            # Disable SSH server completely
+            DISABLE_SSH: true
+            START_SSH_SERVER: false
+          actions:
+            # Enable Forgejo Actions (GitHub Actions compatible CI/CD)
+            ENABLED: true
+      service:
+        http:
+          type: ClusterIP
+          port: 3000
+        ssh:
+          # Disable SSH service creation
+          enabled: false
+      ingress:
+        enabled: true
+        <<: *ingress-traefik
+        hosts:
+          - host: forgejo.${LOKO_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - secretName: forgejo-tls  # pragma: allowlist secret
+            hosts:
+              - forgejo.${LOKO_DOMAIN}
+      persistence:
+        enabled: true
+        size: 10Gi
+      # Use rootless mode for better security
+      image:
+        rootless: true
+    endpoints:
+      - name: http
+        protocol: http
+        port: 3000
+        description: Forgejo web UI and Git HTTPS (SSH disabled)
+    connection-strings:
+      - name: web-ui
+        template: "https://${HOST}"
+      - name: git-https
+        template: "https://${HOST}/repo.git"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: http
+        description: Check if Forgejo HTTP port is open
+      - name: api
+        type: command
+        tier: client
+        image: curlimages/curl:latest
+        command: ["curl", "-f", "https://${HOST}/api/healthz"]
+        description: Check Forgejo health API
+    links:
+      - type: addon
+        target: forgejo-runner
+        auto-deploy: true
+        required: false
+        lifecycle-binding: true
+
+  # CI/CD Runner (merged from runners.yaml)
+  forgejo-runner:
+    category: runner
+    description: CI/CD runner for Forgejo Actions (GitHub Actions compatible)
+    chart:
+      repo: forgejo-runner
+      name: forgejo-runner/forgejo-runner
+      # renovate: datasource=helm depName=forgejo-runner repositoryUrl=oci://codeberg.org/wrenix/helm-charts
+      version: "0.7.0"
+    defaults:
+      namespace: loko-workloads
+      ports: []
+    hooks:
+      - events: ["presync"]
+        show-logs: true
+        command: "/bin/bash"
+        args:
+          - "-c"
+          - |
+            set -e
+            echo "Generating Forgejo runner registration token..."
+
+            # Wait for Forgejo to be ready
+            kubectl --context $LOKO_KUBECTL_CONTEXT wait --for=condition=ready pod -l app.kubernetes.io/name=forgejo -n ${NAMESPACE} --timeout=300s || {
+              echo "ERROR: Forgejo not ready"
+              exit 1
+            }
+
+            # Get Forgejo pod
+            FORGEJO_POD=$(kubectl --context $LOKO_KUBECTL_CONTEXT get pod -l app.kubernetes.io/name=forgejo -n ${NAMESPACE} -o jsonpath='{.items[0].metadata.name}')
+
+            # Generate token
+            echo "Generating token from Forgejo CLI..."
+            TOKEN=$(kubectl --context $LOKO_KUBECTL_CONTEXT exec -n ${NAMESPACE} $FORGEJO_POD -- /usr/local/bin/forgejo actions generate-runner-token)
+
+            # Create secret
+            echo "Creating secret forgejo-runner-init..."
+            kubectl --context $LOKO_KUBECTL_CONTEXT create secret generic forgejo-runner-init \
+              --from-literal=CONFIG_NAME="loko-runner" \
+              --from-literal=CONFIG_INSTANCE="http://forgejo-http:3000" \
+              --from-literal=CONFIG_TOKEN="$TOKEN" \
+              --namespace=${NAMESPACE} \
+              --dry-run=client -o yaml | kubectl --context $LOKO_KUBECTL_CONTEXT apply -f -
+
+            echo "SUCCESS: Token generated and secret created"
+    presets:
+      runner:
+        config:
+          existingInitSecret: "forgejo-runner-init"  # pragma: allowlist secret
+          create: true
+          file:
+            log:
+              level: info
+            runner:
+              capacity: 10
+              envs:
+                DOCKER_HOST: unix:///var/run/docker.sock
+              privileged: true
+        serviceAccount:
+          create: true

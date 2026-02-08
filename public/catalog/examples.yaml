@@ -1,0 +1,61 @@
+# Example Workloads
+example-workloads:
+  http:
+    name: http-webhook
+    description: HTTP service with Traefik ingress (no TCP ports needed)
+    category: utility
+    workload:
+      name: http-webhook
+      enabled: false
+      namespace: default
+      config:
+        repo:
+          ref: securecodebox
+        chart: securecodebox/http-webhook
+        version: "5.5.0"
+        values:
+          ingress:
+            enabled: true
+            ingressClassName: "traefik"
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.tls: "true"
+            hosts:
+              - host: echo.${LOKO_APPS_DOMAIN}
+                paths:
+                  - /
+            tls:
+              - hosts:
+                  - echo.${LOKO_APPS_DOMAIN}
+    notes: |
+      HTTP workloads use Traefik ingress for routing. No TCP ports or
+      cluster recreation needed. Access via: https://echo.<apps-domain>
+
+  tcp:
+    name: tcp-echo
+    description: TCP service requiring port exposure and TCPIngressRoute
+    category: utility
+    workload:
+      name: tcp-echo
+      enabled: false
+      namespace: default
+      ports: [9000]
+      config:
+        repo:
+          ref: istio
+        chart: istio/tcp-echo-server
+        version: "1.2.0"
+        values:
+          service:
+            type: ClusterIP
+            ports:
+              - port: 9000
+                name: tcp
+                protocol: TCP
+    notes: |
+      TCP workloads require:
+      1. Port exposed at cluster creation (requires 'loko recreate' to change)
+      2. DNS host record configuration (via dnsmasq)
+      3. Traefik TCPIngressRoute for routing (automatically configured)
+
+      Access via: telnet tcp-echo.<domain> 9000

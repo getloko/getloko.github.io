@@ -1,0 +1,349 @@
+---
+title: "Prerequisites"
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+LoKO requires several external tools to function. This page explains each prerequisite and how to install it.
+
+## Required Tools
+
+### Python 3.9+
+
+LoKO is written in Python and requires Python 3.9 or higher.
+
+**Check version:**
+```bash
+python --version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install python@3.11
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    sudo apt update
+    sudo apt install python3.11 python3-pip
+    ```
+  </TabItem>
+</Tabs>
+
+### Docker
+
+Container runtime for running Kind clusters.
+
+**Check version:**
+```bash
+docker --version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    Download [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop)
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -fsSL https://get.docker.com | sh
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
+  </TabItem>
+</Tabs>
+
+### Kind
+
+Kubernetes in Docker - creates local Kubernetes clusters.
+
+**Check version:**
+```bash
+kind --version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install kind
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+    chmod +x ./kind
+    sudo mv ./kind /usr/local/bin/kind
+    ```
+  </TabItem>
+</Tabs>
+
+### Helm
+
+Kubernetes package manager.
+
+**Check version:**
+```bash
+helm version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install helm
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    ```
+  </TabItem>
+</Tabs>
+
+### Helmfile
+
+Declarative Helm deployment tool.
+
+**Check version:**
+```bash
+helmfile version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install helmfile
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -L https://github.com/helmfile/helmfile/releases/latest/download/helmfile_linux_amd64 -o helmfile
+    chmod +x helmfile
+    sudo mv helmfile /usr/local/bin/
+    ```
+  </TabItem>
+</Tabs>
+
+### mkcert
+
+Local certificate authority for creating trusted TLS certificates.
+
+**Check version:**
+```bash
+mkcert -version
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install mkcert nss
+    mkcert -install
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    sudo apt install libnss3-tools
+    curl -L https://github.com/FiloSottile/mkcert/releases/latest/download/mkcert-linux-amd64 -o mkcert
+    chmod +x mkcert
+    sudo mv mkcert /usr/local/bin/
+    mkcert -install
+    ```
+  </TabItem>
+</Tabs>
+
+### kubectl
+
+Kubernetes command-line tool.
+
+**Check version:**
+```bash
+kubectl version --client
+```
+
+**Install:**
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install kubectl
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/
+    ```
+  </TabItem>
+</Tabs>
+
+## Optional Tools
+
+### nss / libnss3-tools
+
+Required for Firefox to trust mkcert certificates.
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install nss
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    sudo apt install libnss3-tools
+    ```
+  </TabItem>
+</Tabs>
+
+### Mise (Recommended)
+
+Tool version manager that can install all prerequisites.
+
+```bash
+curl https://mise.run | sh
+```
+
+Then:
+```bash
+cd loko-repo
+mise install
+```
+
+### ngrok
+
+Required for `loko tunnel share` — exposes local workloads to the internet via a public ngrok URL.
+
+**Install**: [ngrok.com/download](https://ngrok.com/download)
+
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install ngrok/ngrok/ngrok
+    ```
+  </TabItem>
+  <TabItem label="Linux">
+    ```bash
+    curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+      && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list \
+      && sudo apt update && sudo apt install ngrok
+    ```
+  </TabItem>
+</Tabs>
+
+After installing, authenticate with your ngrok account:
+```bash
+ngrok config add-authtoken <your-token>
+```
+
+Get your token at [dashboard.ngrok.com](https://dashboard.ngrok.com).
+
+## Verification
+
+After installing all prerequisites, verify with:
+
+```bash
+loko check prerequisites
+```
+
+This checks for:
+- ✅ Docker (running)
+- ✅ Kind (installed)
+- ✅ Helm (installed)
+- ✅ Helmfile (installed)
+- ✅ mkcert (installed)
+- ✅ kubectl (installed)
+- ✅ stern, aws, mise (optional)
+- ✅ ngrok (optional — required for `loko tunnel share`)
+
+## First-Run Experience
+
+**loko automatically checks prerequisites on first run.** When you run any loko command for the first time (except `--help`, `--version`, or `completion` commands), loko will:
+
+1. Display "First run: Checking prerequisites..."
+2. Check all required tools (Docker, kind, helm, kubectl, mkcert, helmfile)
+3. Show status for each tool with install URLs if missing
+4. If missing required tools: show error panel with clear installation guidance
+5. If all prerequisites met: suggest `loko wizard` to create your first configuration
+6. Create a sentinel file (`~/.config/loko/.first-run-v1`) to mark checks complete
+
+**Example first-run output:**
+
+```
+First run: Checking prerequisites...
+
+✅ Docker (24.0.7) - Running
+✅ kind (0.20.0) - Installed
+✅ helm (3.13.0) - Installed
+✅ kubectl (1.28.2) - Installed
+✅ mkcert (1.4.4) - Installed
+✅ helmfile (0.157.0) - Installed
+
+✅ All required tools are installed!
+
+Next step: Create configuration
+  loko wizard  # Interactive configuration wizard
+```
+
+**If tools are missing:**
+
+The first-run check will show installation guidance and exit. After installing the missing tools, run any loko command again to re-check.
+
+**Manual check:**
+
+You can manually run prerequisite checks at any time:
+
+```bash
+loko check prerequisites
+```
+
+**Force re-run first-run checks:**
+
+```bash
+loko check prerequisites --force
+```
+
+This bypasses the sentinel file and runs checks even if they've been completed before.
+
+## System Requirements
+
+**Minimum:**
+- 4 GB RAM
+- 2 CPU cores
+- 10 GB disk space
+
+**Recommended:**
+- 8 GB RAM
+- 4 CPU cores
+- 20 GB disk space
+
+## Port Requirements
+
+LoKO uses these ports by default:
+
+| Port | Service | Configurable |
+|------|---------|--------------|
+| 80 | HTTP (Traefik) | No |
+| 443 | HTTPS (Traefik) | No |
+| 6443 | Kubernetes API | Yes (`cluster.kubernetes.api-port`) |
+
+**Check port availability:**
+```bash
+loko config port-check
+```
+
+## Next Steps
+
+- [Installation Guide](/getting-started/installation/) - Install LoKO
+- [Quick Start](/getting-started/quick-start/) - Create your first cluster
