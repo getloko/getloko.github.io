@@ -1,0 +1,81 @@
+# ============================================================================
+# Main Catalog - Loko Workload Definitions
+# ============================================================================
+# Template variables available in presets values:
+#   ${LOKO_DOMAIN}                    - Local domain (e.g., "dev.me")
+#   ${LOKO_APPS_DOMAIN}               - Apps subdomain (e.g., "apps.dev.me")
+#   ${LOKO_IP}                        - Local IP address
+#   ${LOKO_ENV_NAME}                  - Environment name
+#   ${LOKO_REGISTRY_NAME}             - Registry name
+#   ${LOKO_REGISTRY_HOST}             - Registry host
+#   ${LOKO_SYSTEM_WORKLOADS_NAMESPACE} - System workloads namespace
+#   ${LOKO_KUBECTL_CONTEXT}           - Kubernetes context name
+version: "1"
+
+# File includes (processed by catalog loader)
+includes:
+  - repositories.yaml
+  - components.yaml
+  - workloads/databases.yaml
+  - workloads/messaging.yaml
+  - workloads/cache.yaml
+  - workloads/storage.yaml
+  - workloads/devops.yaml
+  - workloads/devtools.yaml
+  - workloads/gitops.yaml
+  - workloads/collaboration.yaml
+  - examples.yaml
+
+# ============================================================================
+# Shared Templates (YAML Anchors)
+# Available to all included files via merge keys (<<: *anchor-name)
+# ============================================================================
+_templates:
+  # Traefik ingress configuration (websecure + TLS)
+  ingress-traefik: &ingress-traefik
+    enabled: true
+    className: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+
+  # ClusterIP service (most workloads)
+  service-clusterip: &service-clusterip
+    type: ClusterIP
+
+  # Standard UI/linked workload service config (bjw-s pattern) - port 80
+  ui-service-http-80: &ui-service-http-80
+    main:
+      controller: main
+      ports:
+        http:
+          port: 80
+
+  # Standard UI/linked workload service config (bjw-s pattern) - port 8081
+  ui-service-http-8081: &ui-service-http-8081
+    main:
+      controller: main
+      ports:
+        http:
+          port: 8081
+
+  # Port health check template
+  health-check-port: &health-check-port
+    type: tcp
+    tier: infrastructure
+    description: Check if port is open
+
+  # bjw-s app-template chart config
+  chart-bjw-s: &chart-bjw-s
+    repo: bjw-s
+    name: bjw-s/app-template
+    # renovate: datasource=helm depName=app-template repositoryUrl=https://bjw-s-labs.github.io/helm-charts
+    version: "4.6.2"
+
+  # Chart base for groundhog2k
+  chart-base-groundhog2k: &chart-base-groundhog2k
+    repo: groundhog2k
+
+  # Default namespace
+  namespace-loko-workloads: &namespace-workloads
+    namespace: loko-workloads

@@ -1,0 +1,114 @@
+# Development & Testing Tools
+workloads:
+  mock-smtp-sms:
+    category: devtools
+    description: SMTP & SMS testing tool - captures emails (SMTP) and SMS with web UI (MOSIP mock service)
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: [8082, 8081, 8025]  # Web UI (8082 avoids Traefik 8080), WebSocket, SMTP
+    mappings: {}
+    secrets: {}
+    presets:
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: mosipdev/mock-smtp
+                # renovate: datasource=docker depName=mosipdev/mock-smtp
+                tag: "v1.0.0"
+              env:
+                SERVER_HOST: "0.0.0.0"
+                SERVER_PORT: "8082"
+                SMTP_SERVER_PORT: "8025"
+                WS_SERVER_PORT: "8081"
+                # External WebSocket config - tells browser to connect via HTTPS ingress
+                WS_EX_PROTOCOL: "wss"
+                WS_EX_SERVER_PORT: "443"
+                WS_EX_BASE_PATH: "/ws"
+              probes:
+                liveness:
+                  enabled: true
+                  custom: true
+                  spec:
+                    httpGet:
+                      path: /
+                      port: 8082
+                readiness:
+                  enabled: true
+                  custom: true
+                  spec:
+                    httpGet:
+                      path: /
+                      port: 8082
+      service:
+        main:
+          controller: main
+          ports:
+            http:
+              port: 8082
+            websocket:
+              port: 8081
+            smtp:
+              port: 8025
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: mock-smtp-sms.${LOKO_DOMAIN}
+              paths:
+                - path: /ws
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: websocket
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
+          tls:
+            - hosts:
+                - mock-smtp-sms.${LOKO_DOMAIN}
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 50m
+          memory: 128Mi
+    endpoints:
+      - name: web
+        protocol: https
+        port: 8082
+        description: Web UI to view SMS and email messages (real-time via WebSocket)
+      - name: websocket
+        protocol: tcp
+        port: 8081
+        description: WebSocket server for real-time updates
+      - name: smtp
+        protocol: tcp
+        port: 8025
+        description: SMTP server for email testing (captures all emails, never sends)
+    connection-strings:
+      - name: web-ui
+        template: "https://${HOST}"
+      - name: sms-api
+        template: "https://${HOST}/sendsms?mobiles={phone}&sender={app}&message={text}"
+      - name: smtp
+        template: "smtp://${HOST}:8025"
+    health-checks:
+      - name: web-ui
+        type: http
+        tier: infrastructure
+        target: web
+        path: /
+        description: Check if Web UI is accessible
+      - name: sms-send
+        type: command
+        tier: client
+        image: curlimages/curl:latest
+        command: ["curl", "-f", "https://${HOST}/sendsms?mobiles=+15551234567&sender=test&message=healthcheck"]
+        description: Test SMS sending API

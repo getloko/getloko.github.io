@@ -1,0 +1,160 @@
+# Cache Workloads
+workloads:
+  valkey:
+    category: cache
+    description: Redis-compatible in-memory cache (Valkey)
+    chart:
+      repo: groundhog2k
+      name: groundhog2k/valkey
+      # renovate: datasource=helm depName=valkey repositoryUrl=https://groundhog2k.github.io/helm-charts
+      version: "2.2.3"
+    defaults:
+      namespace: loko-workloads
+      ports: [6379]
+      storage:
+        size: 1Gi
+    mappings:
+      storage: storage.requestedSize
+    secrets: {}  # No authentication
+    presets:
+      # Deployment configuration - use StatefulSet even in non-HA mode
+      useDeploymentWhenNonHA: false
+      service:
+        <<: *service-clusterip
+    endpoints:
+      - name: client
+        protocol: tcp
+        port: 6379
+        description: Redis-compatible client connections
+    connection-strings:
+      - name: default
+        template: "redis://${HOST}:6379/${DB}"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: client
+        description: Check if Valkey port is open
+      - name: ping
+        type: command
+        tier: client
+        image: valkey/valkey:8
+        command: ["valkey-cli", "-h", "${HOST}", "PING"]
+        requires: ["valkey-cli"]
+        description: Execute PING command
+    links:
+      - type: addon
+        target: cache-ui
+        auto-deploy: false
+        required: false
+        lifecycle-binding: true
+        config-template:
+          controllers:
+            main:
+              containers:
+                main:
+                  env:
+                    PCA_REDIS_0_NAME: "{{ parent.name }}"
+                    PCA_REDIS_0_HOST: "{{ parent.service_dns }}"
+                    PCA_REDIS_0_PORT: "6379"
+  memcached:
+    category: cache
+    description: High-performance distributed memory caching system
+    chart:
+      repo: cloudpirates
+      name: cloudpirates/memcached
+      # renovate: datasource=helm depName=memcached repositoryUrl=https://cloudpirates-io.github.io/helm-charts
+      version: "0.9.6"
+    defaults:
+      namespace: loko-workloads
+      ports: [11211]
+      storage:
+        size: 512Mi
+    mappings:
+      storage: resources.requests.memory
+    secrets: {}  # No authentication by default
+    presets:
+      service:
+        <<: *service-clusterip
+      # Memory limit for memcached
+      resources:
+        limits:
+          memory: 512Mi
+        requests:
+          memory: 256Mi
+    endpoints:
+      - name: client
+        protocol: tcp
+        port: 11211
+        description: Memcached client connections
+    connection-strings:
+      - name: default
+        template: "${HOST}:11211"
+    health-checks:
+      - name: port
+        <<: *health-check-port
+        target: client
+        description: Check if Memcached port is open
+      - name: stats
+        type: command
+        tier: client
+        image: memcached:1.6-alpine
+        command: ["sh", "-c", "echo stats | nc ${HOST} 11211"]
+        requires: ["nc"]
+        description: Execute stats command
+    links:
+      - type: addon
+        target: cache-ui
+        auto-deploy: false
+        required: false
+        lifecycle-binding: true
+        config-template:
+          controllers:
+            main:
+              containers:
+                main:
+                  env:
+                    PCA_MEMCACHED_0_NAME: "{{ parent.name }}"
+                    PCA_MEMCACHED_0_HOST: "{{ parent.service_dns }}"
+                    PCA_MEMCACHED_0_PORT: "11211"
+  cache-ui:
+    category: ui
+    description: Unified web UI for Redis, Memcached, APCu management (phpCacheAdmin)
+    chart:
+      <<: *chart-bjw-s
+    defaults:
+      namespace: loko-workloads
+      ports: []  # Uses HTTP ingress, no TCP tunnel needed
+    presets:
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: robinn/phpcacheadmin
+                # renovate: datasource=docker depName=robinn/phpcacheadmin
+                tag: "2.4.1"
+              env:
+                # Redis/Valkey connection
+                PCA_REDIS_0_NAME: "Valkey"
+                PCA_REDIS_0_HOST: "valkey.${LOKO_SYSTEM_WORKLOADS_NAMESPACE}.svc.cluster.local"
+                PCA_REDIS_0_PORT: "6379"
+                # Memcached connection
+                PCA_MEMCACHED_0_NAME: "Memcached"
+                PCA_MEMCACHED_0_HOST: "memcached.${LOKO_SYSTEM_WORKLOADS_NAMESPACE}.svc.cluster.local"
+                PCA_MEMCACHED_0_PORT: "11211"
+      service:
+        <<: *ui-service-http-80
+      ingress:
+        main:
+          <<: *ingress-traefik
+          hosts:
+            - host: cache-ui.${LOKO_DOMAIN}
+              paths:
+                - path: /
+                  pathType: Prefix
+                  service:
+                    identifier: main
+                    port: http
+          tls:
+            - hosts:
+                - cache-ui.${LOKO_DOMAIN}
