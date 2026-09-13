@@ -102,14 +102,10 @@ setup.
 ## The workload catalog
 
 LoKO reads its workload catalog from a local directory, `~/.loko/catalog/`
-(or `$LOKO_CONFIG_DIR/catalog/`). Clone the catalog repo there before your
-first `loko config generate` / `loko create`:
+(or `$LOKO_CONFIG_DIR/catalog/`). `loko` fetches it there automatically the
+first time it's needed — nothing to clone or set up manually.
 
-```bash
-git clone https://github.com/getloko/catalog.git ~/.loko/catalog
-```
-
-Keep it current with `git -C ~/.loko/catalog pull`. See
+Keep it current with `loko catalog sync`. See
 [Catalog → Remote Sync](/_catalog/remote-sync/) for details.
 
 ---

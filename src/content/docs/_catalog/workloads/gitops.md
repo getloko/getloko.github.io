@@ -77,7 +77,7 @@ Kubernetes operator for managing FluxCD instances. LoKO uses this workload to in
 After deploying, initialize GitOps:
 
 ```bash
-git -C ~/.loko/catalog pull
+loko catalog sync
 loko gitops init --provider fluxcd
 ```
 
@@ -113,7 +113,7 @@ loko env deploy
 After deploying, initialize GitOps:
 
 ```bash
-git -C ~/.loko/catalog pull
+loko catalog sync
 loko gitops init --provider argocd
 ```
 

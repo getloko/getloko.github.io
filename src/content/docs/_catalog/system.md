@@ -18,28 +18,28 @@ The catalog system consists of:
 
 ## Catalog Source
 
-LoKO reads the catalog from a **local directory** — there is no in-CLI
-download or cache. You manage the directory with `git`.
+LoKO reads the catalog from a **local directory** — `loko` fetches and
+caches it there automatically over HTTPS; there's no manual clone required.
 
 ```
 $LOKO_CONFIG_DIR/catalog/catalog.yaml     # $LOKO_CONFIG_DIR defaults to ~/.loko
 ```
 
 The main `catalog.yaml` and its `includes:` files are loaded and deep-merged
-at startup. Set it up once:
+at startup. The first command that needs it fetches it for you
+automatically; fetch or re-fetch it explicitly with:
 
 ```bash
-git clone https://github.com/getloko/catalog.git ~/.loko/catalog
+loko catalog sync
 ```
 
 **Repository**: [github.com/getloko/catalog](https://github.com/getloko/catalog)
 
-Because it's a plain git checkout:
-
-- **Updates are decoupled from the binary** — `git -C ~/.loko/catalog pull`
-  never requires upgrading `loko`
-- **Teams** share a fork; **PR previews** are just `git checkout <branch>`
-- **Local overrides** — edit a `workloads/*.yaml` file in place
+- **Updates are decoupled from the binary** — `loko catalog sync` never
+  requires upgrading `loko`
+- **Teams** share a fork via `loko catalog sync --url <fork-url>`
+- **Local overrides** — edit a `workloads/*.yaml` file in place; the edit
+  persists until the next `loko catalog sync` overwrites it
 
 See [Catalog Source & Updates](/_catalog/remote-sync/) for the full workflow.
 
@@ -81,11 +81,11 @@ includes:
 
 ## Key Features
 
-### 📁 Git-managed
+### 🌐 Auto-synced
 
-- Plain local directory, cloned from [getloko/catalog](https://github.com/getloko/catalog)
-- Updates independent of `loko` releases (`git pull`)
-- Branches, forks, and PR previews for team catalogs
+- Plain local directory, fetched over HTTPS from [getloko/catalog](https://github.com/getloko/catalog)
+- Updates independent of `loko` releases (`loko catalog sync`)
+- Point `loko catalog sync --url` at a fork for team catalogs
 
 ### 🔒 Validation
 

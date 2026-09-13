@@ -290,10 +290,10 @@ workloads:
 
 ### How do I update workload versions?
 
-Pull the latest catalog into your local clone, then redeploy:
+Sync the latest catalog, then redeploy:
 
 ```bash
-git -C ~/.loko/catalog pull
+loko catalog sync
 loko workloads deploy postgres
 ```
 

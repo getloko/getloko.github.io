@@ -20,7 +20,7 @@ Before starting, ensure you have:
 - A running LoKO environment (`loko env create` completed)
 - **Forgejo** deployed and accessible at `http://forgejo.<your-domain>`
 - One of `flux-operator` or `argocd` in your workloads
-- `git -C ~/.loko/catalog pull` run at least once
+- Catalog synced at least once (`loko catalog sync`, or it auto-syncs on first use)
 
 If you don't have Forgejo yet:
 
@@ -28,7 +28,7 @@ If you don't have Forgejo yet:
 loko workloads add forgejo
 loko workloads add flux-operator
 loko workloads deploy    # deploy new workloads to the running cluster
-git -C ~/.loko/catalog pull
+loko catalog sync
 ```
 
 ## Step 1: Run `loko gitops init`
