@@ -126,7 +126,7 @@ loko workloads add my-app
 loko workloads enable my-app --now
 
 # Check status
-loko catalog list my-app
+loko workloads info my-app
 ```
 
 ## Next Steps

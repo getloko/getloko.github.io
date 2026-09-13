@@ -77,7 +77,18 @@ loko catalog list [flags]
 
 ```
   -c, --category string   Filter by category
-      --search string     Filter by search term (matches workload name or description)
+```
+
+#### `loko catalog search`
+
+Search catalog workloads by name or description
+
+```
+loko catalog search <term> [flags]
+```
+
+```
+  -c, --category string   Filter by category
 ```
 
 ## Certificate commands

@@ -95,7 +95,7 @@ loko catalog list
 ### Get Workload Info
 
 ```bash
-loko catalog list --search postgres   # catalog entry (chart, ports, links)
+loko catalog search postgres          # catalog entry (chart, ports, links)
 loko workloads health                 # runtime status of enabled workloads
 ```
 

@@ -150,7 +150,7 @@ environment first, then fall back to `./loko.yaml`.
 ```bash
 loko catalog list                 # everything the catalog offers
 loko catalog list --category database
-loko catalog list --search postgres
+loko catalog search postgres
 loko catalog info                 # catalog location + counts
 
 loko workloads health             # per-workload: helm release status + pod readiness
@@ -336,7 +336,7 @@ Many workloads have linked web UI tools that provide visual interfaces for manag
 
 ### Viewing Available UIs
 
-Run `loko catalog list --search <name>` — a workload's catalog entry lists its linked child workloads, e.g. `postgres` → `postgres-ui` (pgAdmin), `valkey` → `cache-ui` (phpCacheAdmin).
+Run `loko catalog search <name>` — a workload's catalog entry lists its linked child workloads, e.g. `postgres` → `postgres-ui` (pgAdmin), `valkey` → `cache-ui` (phpCacheAdmin).
 
 ### Adding UI Workloads
 

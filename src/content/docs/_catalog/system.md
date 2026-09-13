@@ -107,10 +107,10 @@ loko catalog info
 # List available workloads
 loko catalog list
 loko catalog list --category database
-loko catalog list --search postgres
+loko catalog search postgres
 
 # Update the local catalog
-git -C ~/.loko/catalog pull
+loko catalog sync
 ```
 
 ## See Also
