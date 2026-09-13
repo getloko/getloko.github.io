@@ -109,39 +109,6 @@ workloads:
     defaults:
       namespace: loko-workloads
       ports: []
-    hooks:
-      - events: ["presync"]
-        show-logs: true
-        command: "/bin/bash"
-        args:
-          - "-c"
-          - |
-            set -e
-            echo "Generating Forgejo runner registration token..."
-
-            # Wait for Forgejo to be ready
-            kubectl --context $LOKO_KUBECTL_CONTEXT wait --for=condition=ready pod -l app.kubernetes.io/name=forgejo -n ${NAMESPACE} --timeout=300s || {
-              echo "ERROR: Forgejo not ready"
-              exit 1
-            }
-
-            # Get Forgejo pod
-            FORGEJO_POD=$(kubectl --context $LOKO_KUBECTL_CONTEXT get pod -l app.kubernetes.io/name=forgejo -n ${NAMESPACE} -o jsonpath='{.items[0].metadata.name}')
-
-            # Generate token
-            echo "Generating token from Forgejo CLI..."
-            TOKEN=$(kubectl --context $LOKO_KUBECTL_CONTEXT exec -n ${NAMESPACE} $FORGEJO_POD -- /usr/local/bin/forgejo actions generate-runner-token)
-
-            # Create secret
-            echo "Creating secret forgejo-runner-init..."
-            kubectl --context $LOKO_KUBECTL_CONTEXT create secret generic forgejo-runner-init \
-              --from-literal=CONFIG_NAME="loko-runner" \
-              --from-literal=CONFIG_INSTANCE="http://forgejo-http:3000" \
-              --from-literal=CONFIG_TOKEN="$TOKEN" \
-              --namespace=${NAMESPACE} \
-              --dry-run=client -o yaml | kubectl --context $LOKO_KUBECTL_CONTEXT apply -f -
-
-            echo "SUCCESS: Token generated and secret created"
     presets:
       runner:
         config:

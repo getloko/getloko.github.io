@@ -132,7 +132,6 @@ workloads:
 | `connection-strings` | array | No | Connection string templates |
 | `health-checks` | array | No | Health check definitions |
 | `links` | array | No | Related workload links |
-| `hooks` | array | No | Helmfile lifecycle hooks |
 
 ---
 
@@ -440,39 +439,6 @@ links:
 - `dependent` - Required dependency
 - `sidecar` - Co-deployed service
 - `extension` - Optional extension
-
----
-
-## Hooks
-
-Helmfile lifecycle hooks for custom actions.
-
-```yaml
-hooks:
-  - events: ["presync"]          # presync | postsync | preuninstall
-    show-logs: true              # Show hook output
-    command: "/bin/bash"
-    args:
-      - "-c"
-      - |
-        set -e
-        echo "Running pre-sync hook..."
-        # Custom commands here
-```
-
-**Available Events:**
-
-- `presync` - Before Helm install/upgrade
-- `postsync` - After Helm install/upgrade
-- `preuninstall` - Before Helm uninstall
-
-**Environment Variables:**
-
-- `$LOKO_KUBECTL_CONTEXT` - Kubernetes context
-- `$LOKO_DOMAIN` - Local domain
-- `$NAMESPACE` - Workload namespace
-
----
 
 ## Template Variables
 
