@@ -356,7 +356,7 @@ gitops:
 | `provider` | string | No | `"fluxcd"` | GitOps provider: `"fluxcd"` or `"argocd"`. |
 | `forgejo.org` | string\|null | No | `null` | Forgejo organization to own the GitOps repo. If null, the authenticated user's personal account is used. |
 
-See the [GitOps User Guide](../user-guide/gitops) for full details.
+See the [GitOps User Guide](/user-guide/gitops/) for full details.
 
 ---
 
@@ -441,7 +441,7 @@ enabled: false
 
 ## See Also
 
-- [Configuration Guide](../user-guide/configuration) — how to generate and customize `loko.yaml`
-- [Workload Management](../user-guide/workload-management) — adding and deploying workloads
-- [GitOps](../user-guide/gitops) — GitOps integration
-- [Commands Reference](commands) — CLI command reference
+- [Configuration Guide](/user-guide/configuration/) — how to generate and customize `loko.yaml`
+- [Workload Management](/user-guide/workload-management/) — adding and deploying workloads
+- [GitOps](/user-guide/gitops/) — GitOps integration
+- [Commands Reference](/reference/commands/) — CLI command reference

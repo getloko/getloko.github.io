@@ -89,28 +89,28 @@ graph TB
 
 ## 🔍 Browse Workloads
 
-### 🗄️ [Databases](workloads/databases)
+### 🗄️ [Databases](/_catalog/workloads/databases/)
 PostgreSQL, MySQL, MongoDB, DynamoDB Local - Relational, NoSQL, and AWS-compatible databases with web UIs
 
-### ⚡ [Cache & KV](workloads/cache)
+### ⚡ [Cache & KV](/_catalog/workloads/cache/)
 Valkey, Memcached - In-memory caching with unified phpCacheAdmin UI
 
-### 📧 [Message Queues](workloads/messaging)
+### 📧 [Message Queues](/_catalog/workloads/messaging/)
 RabbitMQ, NATS, Redpanda, ElasticMQ - Message brokers and AWS SQS-compatible queuing
 
-### 📁 [Object Storage](workloads/storage)
+### 📁 [Object Storage](/_catalog/workloads/storage/)
 Garage - S3-compatible distributed storage
 
-### 🛠️ [DevOps & CI/CD](workloads/devops)
+### 🛠️ [DevOps & CI/CD](/_catalog/workloads/devops/)
 Forgejo, Forgejo Runner - Git hosting and CI/CD runners
 
-### 🧪 [Dev & Testing Tools](workloads/devtools)
+### 🧪 [Dev & Testing Tools](/_catalog/workloads/devtools/)
 httpbin, IT Tools, Mock SMTP/SMS - HTTP testing, developer utilities, and email/SMS testing
 
-### 🔄 [GitOps](workloads/gitops)
+### 🔄 [GitOps](/_catalog/workloads/gitops/)
 ArgoCD, Flux Operator - Continuous delivery automation
 
-### 💬 [Collaboration](workloads/collaboration)
+### 💬 [Collaboration](/_catalog/workloads/collaboration/)
 Excalidraw, Penpot - Virtual whiteboard and open-source design platform
 
 ## 📊 Catalog Stats
@@ -242,7 +242,7 @@ workloads:
       version: "1.0.0"
 ```
 
-See [Helm Repositories](repositories) for the list of catalog repositories.
+See [Helm Repositories](/_catalog/repositories/) for the list of catalog repositories.
 
 ### Key Differences
 
@@ -268,7 +268,7 @@ https://raw.githubusercontent.com/getloko/catalog/main/repositories.yaml
 
 ## 🤝 Contributing
 
-Want to add a workload? See the [Contributing Guide](contributing).
+Want to add a workload? See the [Contributing Guide](/_catalog/contributing/).
 
 ### Quick Contribution
 
@@ -279,7 +279,7 @@ Want to add a workload? See the [Contributing Guide](contributing).
 
 ## 📄 Schema Reference
 
-See [Schema Documentation](schema) for complete catalog format specification.
+See [Schema Documentation](/_catalog/schema/) for complete catalog format specification.
 
 ## 🔧 Validation
 
@@ -293,9 +293,9 @@ yamllint catalog.yaml workloads/*.yaml
 ## 📚 Resources
 
 - [LoKO Documentation](https://getloko.github.io/)
-- [LoKO GitHub](https://github.com/getloko/loko)
+- [LoKO GitHub](https://github.com/getloko/loko-releases)
 - [Binary Releases](https://github.com/getloko/loko-releases/releases)
-- [Report Issues](https://github.com/getloko/loko/issues)
+- [Report Issues](https://github.com/getloko/loko-releases/issues)
 
 ## 📦 Version
 

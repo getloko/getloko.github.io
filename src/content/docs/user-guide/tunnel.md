@@ -8,7 +8,7 @@ LAN) into the Kind cluster's internal network. It's how database clients and
 other raw-TCP tools reach workloads at your domain, e.g. `postgres.dev.me:5432`.
 
 For exposing an **HTTP(S)** workload to the **public internet**, see
-[Sharing](share) — that's a separate mechanism (`loko share`, via ngrok).
+[Sharing](/user-guide/share/) — that's a separate mechanism (`loko share`, via ngrok).
 
 ## How it works
 

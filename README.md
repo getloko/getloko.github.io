@@ -1,6 +1,6 @@
 # LoKO Documentation
 
-Official documentation website for [LoKO](https://github.com/getloko/loko) - Local Kubernetes Oasis.
+Official documentation website for [LoKO](https://github.com/getloko/loko-releases) - Local Kubernetes Oasis.
 
 Live site: https://getloko.github.io/
 

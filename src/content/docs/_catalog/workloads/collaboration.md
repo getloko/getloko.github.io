@@ -100,5 +100,5 @@ loko workloads connect penpot
 
 ## Next Steps
 
-- [Contributing Guide](../contributing)
-- [Schema Reference](../schema)
+- [Contributing Guide](/_catalog/contributing/)
+- [Schema Reference](/_catalog/schema/)

@@ -354,6 +354,6 @@ LoKO handles OCI repositories automatically.
 
 ## Next Steps
 
-- [Browse Workloads](workloads/index)
-- [Components](components)
-- [Contributing Guide](contributing)
+- [Browse Workloads](/_catalog/workloads/)
+- [Components](/_catalog/components/)
+- [Contributing Guide](/_catalog/contributing/)

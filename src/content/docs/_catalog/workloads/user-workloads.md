@@ -80,7 +80,7 @@ workloads:
 
 ## Using External Repositories
 
-If your chart is **not** from a [catalog repository](../repositories), add the Helm repository to your config:
+If your chart is **not** from a [catalog repository](/_catalog/repositories/), add the Helm repository to your config:
 
 ```yaml
 # loko.yaml
@@ -131,6 +131,6 @@ loko catalog list my-app
 
 ## Next Steps
 
-- [Helm Repositories](../repositories) - Available catalog repos
-- [System Workloads](databases) - Pre-configured workloads
-- [Contributing Guide](../contributing) - Add your workload to the catalog
+- [Helm Repositories](/_catalog/repositories/) - Available catalog repos
+- [System Workloads](/_catalog/workloads/databases/) - Pre-configured workloads
+- [Contributing Guide](/_catalog/contributing/) - Add your workload to the catalog

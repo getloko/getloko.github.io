@@ -274,6 +274,6 @@ The full teardown completes in about 30 seconds.
 
 ## Next Steps
 
-- [GitOps User Guide](../user-guide/gitops) — full reference including secrets handling, advanced flags, and troubleshooting
-- [Workload Management](../user-guide/workload-management) — add more services to your cluster
-- [GitOps Workloads](../catalog/workloads/gitops) — Forgejo, FluxCD, and ArgoCD catalog entries
+- [GitOps User Guide](/user-guide/gitops/) — full reference including secrets handling, advanced flags, and troubleshooting
+- [Workload Management](/user-guide/workload-management/) — add more services to your cluster
+- [GitOps Workloads](/_catalog/workloads/gitops/) — Forgejo, FluxCD, and ArgoCD catalog entries

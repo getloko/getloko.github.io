@@ -85,13 +85,13 @@ Open a pull request on GitHub with:
 
 ### Core Code Contributions
 
-The LoKO CLI is written in Go. You need the Go toolchain (see
-[`go.mod`](https://github.com/getloko/loko/blob/main/go.mod) for the version).
+The LoKO CLI is written in Go, developed in a private repository. You need the Go
+toolchain (internal contributors: see `go.mod` in the `loko` repo for the version).
 
 #### Development Setup
 
 ```bash
-# Fork https://github.com/getloko/loko, then:
+# Internal contributors: fork/clone the private loko repo directly, then:
 git clone https://github.com/YOUR-USERNAME/loko.git
 cd loko
 
@@ -540,10 +540,9 @@ defaults:
 
 Need help with your contribution?
 
-- **GitHub Discussions**: [getloko/loko/discussions](https://github.com/getloko/loko/discussions) - Ask questions
-- **GitHub Issues**: [getloko/loko/issues](https://github.com/getloko/loko/issues) - Report bugs, request features
+- **GitHub Issues** (bug reports, feature requests, questions): [getloko/loko-releases/issues](https://github.com/getloko/loko-releases/issues)
 - **Documentation**: [https://getloko.github.io/](https://getloko.github.io/) - Comprehensive guides
-- **FAQ**: [Frequently Asked Questions](../reference/faq) - Common questions answered
+- **FAQ**: [Frequently Asked Questions](/reference/faq/) - Common questions answered
 
 ### Suggest Workloads
 
@@ -572,6 +571,6 @@ By contributing, you agree that your contributions will be licensed under the sa
 
 ## Next Steps
 
-- [Schema Reference](schema) - Complete workload schema
-- [Testing Guidelines](testing) - How to test workloads
-- [Browse Workloads](workloads/index) - Existing workloads
+- [Schema Reference](/_catalog/schema/) - Complete workload schema
+- [Testing Guidelines](/_catalog/testing/) - How to test workloads
+- [Browse Workloads](/_catalog/workloads/) - Existing workloads

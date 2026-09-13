@@ -2,10 +2,10 @@
 title: GitOps Workloads
 ---
 
-Continuous delivery and Git-driven deployment tools. These workloads integrate with [`loko gitops`](../../user-guide/gitops) to provide a fully automated GitOps pipeline inside your local cluster.
+Continuous delivery and Git-driven deployment tools. These workloads integrate with [`loko gitops`](/user-guide/gitops/) to provide a fully automated GitOps pipeline inside your local cluster.
 
 :::tip
-See the **[GitOps User Guide](../../user-guide/gitops)** for a full walkthrough of the `loko gitops init/status/destroy` commands, or follow the **[GitOps Setup Tutorial](../../tutorials/gitops-setup)** for a hands-on introduction.
+See the **[GitOps User Guide](/user-guide/gitops/)** for a full walkthrough of the `loko gitops init/status/destroy` commands, or follow the **[GitOps Setup Tutorial](/tutorials/gitops-setup/)** for a hands-on introduction.
 :::
 
 ---
@@ -140,9 +140,9 @@ Forgejo (Git host)  →  Push webhook  →  FluxCD or ArgoCD  →  Cluster recon
 
 `loko gitops init` installs the provider, creates the Forgejo repository, scaffolds it with Kustomize templates, and wires up the webhook — all in a single command.
 
-See the [GitOps User Guide](../../user-guide/gitops) for full details.
+See the [GitOps User Guide](/user-guide/gitops/) for full details.
 
 ## Next Steps
 
-- [GitOps User Guide](../../user-guide/gitops) — architecture, secrets handling, advanced flags
-- [GitOps Setup Tutorial](../../tutorials/gitops-setup) — hands-on step-by-step walkthrough
+- [GitOps User Guide](/user-guide/gitops/) — architecture, secrets handling, advanced flags
+- [GitOps Setup Tutorial](/tutorials/gitops-setup/) — hands-on step-by-step walkthrough

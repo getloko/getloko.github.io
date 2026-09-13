@@ -23,7 +23,7 @@ Before starting, ensure you have:
 - 8GB RAM available
 - Internet connection
 
-If you haven't installed prerequisites yet, see the [Installation Guide](../getting-started/installation).
+If you haven't installed prerequisites yet, see the [Installation Guide](/getting-started/installation/).
 
 ## Step 1: Install LoKO
 
@@ -407,20 +407,20 @@ Congratulations! You've:
 Now that you have a working environment:
 
 ### Tutorials
-- [Deploy a Custom Application](custom-workload)
-- [Multi-Node Cluster Setup](multi-node-setup)
-- [Deploy a Database Cluster](deploy-database)
+- [Deploy a Custom Application](/tutorials/custom-workload/)
+- [Multi-Node Cluster Setup](/tutorials/multi-node-setup/)
+- [Deploy a Database Cluster](/tutorials/deploy-database/)
 
 ### User Guides
-- [Workload Management](../user-guide/workload-management) - Deploy more services
-- [Network & DNS](../user-guide/network-dns) - Configure DNS
-- [Registry](../user-guide/registry) - Use the local registry
-- [Configuration](../user-guide/configuration) - Customize your setup
+- [Workload Management](/user-guide/workload-management/) - Deploy more services
+- [Network & DNS](/user-guide/network-dns/) - Configure DNS
+- [Registry](/user-guide/registry/) - Use the local registry
+- [Configuration](/user-guide/configuration/) - Customize your setup
 
 ### Reference
-- [CLI Reference](../user-guide/cli-reference) - All commands
-- [Workload Catalog](../_catalog/workloads) - Available workloads
-- [Troubleshooting](../reference/troubleshooting) - Common issues
+- [CLI Reference](/user-guide/cli-reference/) - All commands
+- [Workload Catalog](/_catalog/workloads/) - Available workloads
+- [Troubleshooting](/reference/troubleshooting/) - Common issues
 
 ## Clean Up
 
@@ -446,4 +446,4 @@ brew uninstall loko
 
 ---
 
-**Questions or issues?** Check the [Troubleshooting Guide](../reference/troubleshooting) or [open an issue](https://github.com/getloko/loko/issues).
+**Questions or issues?** Check the [Troubleshooting Guide](/reference/troubleshooting/) or [open an issue](https://github.com/getloko/loko-releases/issues).

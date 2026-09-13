@@ -343,6 +343,6 @@ graph LR
 
 ## Next Steps
 
-- [Certificates](certificates) - TLS certificate setup
-- [Workload Management](workload-management) - Deploy services
-- [Troubleshooting](../reference/troubleshooting) - Common DNS issues
+- [Certificates](/user-guide/certificates/) - TLS certificate setup
+- [Workload Management](/user-guide/workload-management/) - Deploy services
+- [Troubleshooting](/reference/troubleshooting/) - Common DNS issues

@@ -188,6 +188,6 @@ preview overlay manifests and pushes a `sample-webapp-pr:<tag>` OCI artifact for
 
 ## Where To Go Next
 
-- [GitOps User Guide](../user-guide/gitops) — standard git-based mode reference
-- [Tutorial: GitOps Setup](../tutorials/gitops-setup) — step-by-step walkthrough
-- [Config Schema](../reference/config-schema) — `gitops.gitless` field reference
+- [GitOps User Guide](/user-guide/gitops/) — standard git-based mode reference
+- [Tutorial: GitOps Setup](/tutorials/gitops-setup/) — step-by-step walkthrough
+- [Config Schema](/reference/config-schema/) — `gitops.gitless` field reference

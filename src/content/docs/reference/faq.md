@@ -17,7 +17,7 @@ LoKO (Local Kubernetes Oasis) is a single-binary CLI tool that simplifies local 
 - Local container registry
 - Comprehensive workload management
 
-See [Overview](../index) for details.
+See [Overview](//) for details.
 
 ---
 
@@ -69,7 +69,7 @@ brew install getloko/tap/loko
 
 Or download the binary for your platform from the
 [latest release](https://github.com/getloko/loko-releases/releases/latest).
-See the [Installation Guide](../getting-started/installation) for details.
+See the [Installation Guide](/getting-started/installation/) for details.
 
 ---
 
@@ -93,7 +93,7 @@ Check them with:
 loko check prerequisites
 ```
 
-See [Prerequisites](../getting-started/prerequisites) for details.
+See [Prerequisites](/getting-started/prerequisites/) for details.
 
 ---
 
@@ -114,7 +114,7 @@ Generate it with:
 loko config generate
 ```
 
-See [Configuration Guide](../user-guide/configuration) for details.
+See [Configuration Guide](/user-guide/configuration/) for details.
 
 ---
 
@@ -157,7 +157,7 @@ workloads:
               max_connections = 500
 ```
 
-See [Workload Management](../user-guide/workload-management) for details.
+See [Workload Management](/user-guide/workload-management/) for details.
 
 ---
 
@@ -179,7 +179,7 @@ ping postgres.dev.me
 curl https://app.dev.me
 ```
 
-See [Network & DNS](../user-guide/network-dns) for details.
+See [Network & DNS](/user-guide/network-dns/) for details.
 
 ---
 
@@ -209,10 +209,10 @@ tunnel:
   enabled: true
   bind-address: null   # defaults to network.ip
 ```
-See [Tunnel](../user-guide/tunnel).
+See [Tunnel](/user-guide/tunnel/).
 
 2. **Public internet** — expose an HTTP(S) workload with `loko share` (needs
-   ngrok). See [Sharing](../user-guide/share).
+   ngrok). See [Sharing](/user-guide/share/).
 
 ---
 
@@ -249,7 +249,7 @@ loko workloads deploy postgres
 loko workloads connect postgres --show-password
 ```
 
-See [Deploy Database Tutorial](../tutorials/deploy-database) for details.
+See [Deploy Database Tutorial](/tutorials/deploy-database/) for details.
 
 ---
 
@@ -411,7 +411,7 @@ docker tag alpine cr.dev.me:5000/alpine
 docker push cr.dev.me:5000/alpine
 ```
 
-See [Registry Guide](../user-guide/registry) for details.
+See [Registry Guide](/user-guide/registry/) for details.
 
 ---
 
@@ -542,14 +542,13 @@ Requirements:
 ### Where can I get help?
 
 - **Documentation**: [https://getloko.github.io/](https://getloko.github.io/)
-- **GitHub Issues**: [https://github.com/getloko/loko/issues](https://github.com/getloko/loko/issues)
-- **GitHub Discussions**: [https://github.com/getloko/loko/discussions](https://github.com/getloko/loko/discussions)
+- **GitHub Issues** (bugs, features, questions): [https://github.com/getloko/loko-releases/issues](https://github.com/getloko/loko-releases/issues)
 
 ---
 
 ### How do I report a bug?
 
-1. Check [existing issues](https://github.com/getloko/loko/issues)
+1. Check [existing issues](https://github.com/getloko/loko-releases/issues)
 2. Reproduce and capture the full output
 3. Create issue with:
    - LoKO version (`loko version`)
@@ -563,12 +562,11 @@ Requirements:
 
 Contributions are welcome! You can help by:
 
-- Reporting bugs on [GitHub Issues](https://github.com/getloko/loko/issues)
-- Suggesting features on [GitHub Discussions](https://github.com/getloko/loko/discussions)
+- Reporting bugs or suggesting features on [GitHub Issues](https://github.com/getloko/loko-releases/issues)
 - Improving documentation
 - Submitting pull requests
 
-See the [Contributing Guide](../_catalog/contributing) for details.
+See the [Contributing Guide](/_catalog/contributing/) for details.
 
 ---
 
@@ -578,9 +576,9 @@ See the [Contributing Guide](../_catalog/contributing) for details.
 
 For issues specific to LoKO:
 
-- **Bug reports**: [GitHub Issues](https://github.com/getloko/loko/issues)
-- **Feature requests**: [GitHub Issues](https://github.com/getloko/loko/issues)
-- **Questions**: [GitHub Discussions](https://github.com/getloko/loko/discussions)
+- **Bug reports**: [GitHub Issues](https://github.com/getloko/loko-releases/issues)
+- **Feature requests**: [GitHub Issues](https://github.com/getloko/loko-releases/issues)
+- **Questions**: [GitHub Issues](https://github.com/getloko/loko-releases/issues)
 - **Documentation**: [https://getloko.github.io/](https://getloko.github.io/)
 
 When reporting bugs, include:
@@ -621,7 +619,7 @@ If you're having trouble installing prerequisites (Docker, kubectl, etc.), refer
 
 ## See Also
 
-- [Troubleshooting Guide](troubleshooting) - Detailed troubleshooting
-- [Commands Reference](commands) - All CLI commands
-- [User Guide](../user-guide/index) - Complete user documentation
-- [Tutorials](../tutorials/first-cluster) - Step-by-step guides
+- [Troubleshooting Guide](/reference/troubleshooting/) - Detailed troubleshooting
+- [Commands Reference](/reference/commands/) - All CLI commands
+- [User Guide](/user-guide/) - Complete user documentation
+- [Tutorials](/tutorials/first-cluster/) - Step-by-step guides

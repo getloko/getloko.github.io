@@ -381,5 +381,5 @@ kubectl get pods -n loko-system
 
 ## Next Steps
 
-- [Workload Catalog](workloads/index)
-- [Contributing Guide](contributing)
+- [Workload Catalog](/_catalog/workloads/)
+- [Contributing Guide](/_catalog/contributing/)

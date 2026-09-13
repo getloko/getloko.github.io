@@ -308,6 +308,6 @@ Each tool does one thing well:
 
 ---
 
-**Ready to try it?** → [Quick Start Guide](../getting-started/quick-start)
+**Ready to try it?** → [Quick Start Guide](/getting-started/quick-start/)
 
-**Want to customize?** → [Configuration Guide](../user-guide/configuration)
+**Want to customize?** → [Configuration Guide](/user-guide/configuration/)

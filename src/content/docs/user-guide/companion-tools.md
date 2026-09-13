@@ -68,4 +68,4 @@ Not every workload+UI pairing is a companion link. `garage`'s web UI, for exampl
 
 ## Adding a new companion link
 
-To wire up a new companion, no Go code changes are needed — add a `links:` entry to the parent's catalog YAML with the right `config-template` for that companion's config shape, following the worked examples above. See the [Catalog Schema Reference](../_catalog/schema) for the full `links:` field spec.
+To wire up a new companion, no Go code changes are needed — add a `links:` entry to the parent's catalog YAML with the right `config-template` for that companion's config shape, following the worked examples above. See the [Catalog Schema Reference](/_catalog/schema/) for the full `links:` field spec.

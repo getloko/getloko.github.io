@@ -647,6 +647,6 @@ kubectl get events -n common-services
 
 ## Next Steps
 
-- [Network & DNS](network-dns) - Configure DNS resolution
-- [Registry](registry) - Use local container registry
-- [Troubleshooting](../reference/troubleshooting) - Common issues
+- [Network & DNS](/user-guide/network-dns/) - Configure DNS resolution
+- [Registry](/user-guide/registry/) - Use local container registry
+- [Troubleshooting](/reference/troubleshooting/) - Common issues

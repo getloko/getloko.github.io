@@ -1,21 +1,24 @@
 {
   "ignorePatterns": [
     {
-      "pattern": "^https://github.com/getloko/loko"
+      "comment": "Placeholder *.dev.me domains used in doc examples - illustrative, never real/resolvable",
+      "pattern": "^https?://[a-zA-Z0-9.-]*\\.dev\\.me"
     },
     {
-      "pattern": "^https://raw.githubusercontent.com/getloko/loko"
+      "comment": "Root-relative Starlight routes (/foo/bar/) - validated by starlight-links-validator during npm run build, which understands the real routing table",
+      "pattern": "^/"
     },
     {
-      "pattern": "^https://getloko.github.io/"
+      "comment": "Private loko source repo - not publicly reachable by design; internal-contributor-only build-from-source references",
+      "pattern": "^https://github\\.com/getloko/loko(/blob/|\\.git)"
     },
     {
-      "comment": "Ignore relative links - Starlight handles these without .md extension",
-      "pattern": "^\\.\\./"
+      "comment": "Same-site absolute links - validated by starlight-links-validator",
+      "pattern": "^https://getloko\\.github\\.io/"
     },
     {
-      "comment": "Ignore same-directory relative links",
-      "pattern": "^[^/]+$"
+      "comment": "TEMPORARY: loko-releases is still private as of this writing ('will be made public' has not happened yet), so unauthenticated requests 404. Remove this pattern the day loko-releases goes public - these links are otherwise correct and will resolve immediately.",
+      "pattern": "^https://github\\.com/getloko/loko-releases"
     }
   ],
   "timeout": "20s",

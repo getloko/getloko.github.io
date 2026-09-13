@@ -83,8 +83,9 @@ xattr -d com.apple.quarantine /usr/local/bin/loko
 
 ### From source
 
-For contributing or testing unreleased changes. Requires Go (see the version in
-[`go.mod`](https://github.com/getloko/loko/blob/main/go.mod)):
+For contributing or testing unreleased changes. This requires access to the private
+`loko` source repository (internal contributors only) and Go (see the version in
+`go.mod`):
 
 ```bash
 git clone https://github.com/getloko/loko.git
@@ -93,7 +94,7 @@ make build          # produces ./loko
 sudo install loko /usr/local/bin/loko
 ```
 
-See the [Contributing Guide](../_catalog/contributing) for the full development
+See the [Contributing Guide](/_catalog/contributing/) for the full development
 setup.
 
 ---
@@ -109,7 +110,7 @@ git clone https://github.com/getloko/catalog.git ~/.loko/catalog
 ```
 
 Keep it current with `git -C ~/.loko/catalog pull`. See
-[Catalog → Remote Sync](../_catalog/remote-sync) for details.
+[Catalog → Remote Sync](/_catalog/remote-sync/) for details.
 
 ---
 
@@ -252,4 +253,4 @@ loko certs ca install
 
 ✅ LoKO installed &nbsp; ✅ Prerequisites verified &nbsp; ✅ Catalog cloned
 
-→ [Quick Start Guide](quick-start) · [Configuration Guide](../user-guide/configuration)
+→ [Quick Start Guide](/getting-started/quick-start/) · [Configuration Guide](/user-guide/configuration/)

@@ -552,6 +552,6 @@ Before submitting your workload:
 
 ## Next Steps
 
-- [Contributing Guidelines](contributing) - How to contribute
-- [Schema Reference](schema) - Workload schema documentation
-- [Browse Workloads](workloads/index) - Existing workloads
+- [Contributing Guidelines](/_catalog/contributing/) - How to contribute
+- [Schema Reference](/_catalog/schema/) - Workload schema documentation
+- [Browse Workloads](/_catalog/workloads/) - Existing workloads

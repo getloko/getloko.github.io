@@ -573,10 +573,10 @@ image:
 
 ## Next Steps
 
-- [Multi-Node Setup](multi-node-setup) - Scale your cluster
-- [Workload Management](../user-guide/workload-management) - Manage workloads
-- [Registry Guide](../user-guide/registry) - Use local registry
-- [Configuration](../user-guide/configuration) - Advanced config
+- [Multi-Node Setup](/tutorials/multi-node-setup/) - Scale your cluster
+- [Workload Management](/user-guide/workload-management/) - Manage workloads
+- [Registry Guide](/user-guide/registry/) - Use local registry
+- [Configuration](/user-guide/configuration/) - Advanced config
 
 ---
 

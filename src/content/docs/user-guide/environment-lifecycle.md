@@ -189,7 +189,7 @@ Use status output to determine next steps:
 
 **DNS degraded** → Port conflict detected
 - Check what's using port 53: `sudo lsof -i :53`
-- See [Troubleshooting - DNS Issues](../reference/troubleshooting#issue-1-dns-not-resolving)
+- See [Troubleshooting - DNS Issues](/reference/troubleshooting/#issue-1-dns-not-resolving)
 
 **Registry stopped** → Check if enabled in config
 - Verify registry enabled in loko.yaml
@@ -241,10 +241,10 @@ The cluster containers are stopped after a reboot. Run `loko start`, then
 
 When status shows unhealthy components, consult the troubleshooting guide:
 
-- **DNS issues** → [Issue #1: DNS Not Resolving](../reference/troubleshooting#issue-1-dns-not-resolving)
-- **DNS not resolving** → [Issue #7: DNS Not Resolving](../reference/troubleshooting#issue-7-dns-not-resolving-test-domains)
-- **Workload failures** → [Issue #6: Workload Deployment Fails](../reference/troubleshooting#issue-6-workload-deployment-fails)
-- **General issues** → [Diagnostic Workflow](../reference/troubleshooting#diagnostic-workflow)
+- **DNS issues** → [Issue #1: DNS Not Resolving](/reference/troubleshooting/#issue-1-dns-not-resolving)
+- **DNS not resolving** → [Issue #7: DNS Not Resolving](/reference/troubleshooting/#issue-7-dns-not-resolving-test-domains)
+- **Workload failures** → [Issue #6: Workload Deployment Fails](/reference/troubleshooting/#issue-6-workload-deployment-fails)
+- **General issues** → [Diagnostic Workflow](/reference/troubleshooting/#diagnostic-workflow)
 
 ### Scripting Against Status
 
@@ -530,6 +530,6 @@ loko env create
 
 ## Next Steps
 
-- [Configuration Guide](configuration) - Customize your environment
-- [Workload Management](workload-management) - Deploy services
-- [Troubleshooting](../reference/troubleshooting) - Common issues
+- [Configuration Guide](/user-guide/configuration/) - Customize your environment
+- [Workload Management](/user-guide/workload-management/) - Deploy services
+- [Troubleshooting](/reference/troubleshooting/) - Common issues

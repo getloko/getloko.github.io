@@ -19,7 +19,7 @@ export default defineConfig({
 			},
 			favicon: '/favicon.ico',
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/getloko/loko' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/getloko/loko-releases' },
 			],
 			components: {
 				Head: './src/components/Head.astro',

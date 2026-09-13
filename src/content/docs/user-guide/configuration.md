@@ -746,6 +746,6 @@ See `loko.yaml.comprehensive.example` in the repository for a complete example w
 
 ## Next Steps
 
-- [Environment Lifecycle](environment-lifecycle) - Manage environments
-- [Workload Management](workload-management) - Deploy services
-- [Config Schema Reference](../reference/config-schema) - Complete schema
+- [Environment Lifecycle](/user-guide/environment-lifecycle/) - Manage environments
+- [Workload Management](/user-guide/workload-management/) - Deploy services
+- [Config Schema Reference](/reference/config-schema/) - Complete schema

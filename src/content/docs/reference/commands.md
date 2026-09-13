@@ -1438,11 +1438,11 @@ eval "$(loko completion zsh)"      # zsh
 loko completion fish | source      # fish
 ```
 
-See [Shell Completions](../user-guide/shell-completions).
+See [Shell Completions](/user-guide/shell-completions/).
 
 ## See also
 
-- [User Guide](../user-guide/index)
-- [Workload Management](../user-guide/workload-management)
-- [Environment Lifecycle](../user-guide/environment-lifecycle)
-- [Catalog Source & Updates](../_catalog/remote-sync)
+- [User Guide](/user-guide/)
+- [Workload Management](/user-guide/workload-management/)
+- [Environment Lifecycle](/user-guide/environment-lifecycle/)
+- [Catalog Source & Updates](/_catalog/remote-sync/)

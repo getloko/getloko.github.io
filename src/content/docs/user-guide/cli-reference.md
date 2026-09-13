@@ -4,7 +4,7 @@ title: "CLI Reference"
 
 
 The complete, always-current command list lives at
-**[Command Reference](../reference/commands)** — it is generated from
+**[Command Reference](/reference/commands/)** — it is generated from
 `loko <command> --help`. This page covers the concepts that apply across all
 commands.
 
@@ -79,11 +79,11 @@ eval "$(loko completion zsh)"      # zsh
 loko completion fish | source      # fish
 ```
 
-See [Shell Completions](shell-completions) to make it permanent.
+See [Shell Completions](/user-guide/shell-completions/) to make it permanent.
 
 ## Next steps
 
-- [Command Reference](../reference/commands) — every command and flag
-- [Environment Lifecycle](environment-lifecycle)
-- [Workload Management](workload-management)
-- [Troubleshooting](../reference/troubleshooting)
+- [Command Reference](/reference/commands/) — every command and flag
+- [Environment Lifecycle](/user-guide/environment-lifecycle/)
+- [Workload Management](/user-guide/workload-management/)
+- [Troubleshooting](/reference/troubleshooting/)

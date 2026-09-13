@@ -43,6 +43,9 @@ jobs:
         run: npm run astro check || true
         continue-on-error: true
 
+      - name: Check for broken links
+        run: npm run check-links
+
   build:
     needs: validate
     runs-on: ubuntu-latest

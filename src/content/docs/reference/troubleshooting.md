@@ -152,7 +152,7 @@ git --version
 helmfile --version
 ```
 
-**Related:** [Prerequisites](../getting-started/prerequisites)
+**Related:** [Prerequisites](/getting-started/prerequisites/)
 
 ---
 
@@ -234,7 +234,7 @@ loko status --config /path/to/loko.yaml
 loko status
 ```
 
-**Related:** [Configuration Guide](../user-guide/configuration)
+**Related:** [Configuration Guide](/user-guide/configuration/)
 
 ---
 
@@ -295,7 +295,7 @@ loko status
 kind get clusters
 ```
 
-**Related:** [Environment Lifecycle](../user-guide/environment-lifecycle)
+**Related:** [Environment Lifecycle](/user-guide/environment-lifecycle/)
 
 ---
 
@@ -448,7 +448,7 @@ dig postgres.dev.me
 # Should return configured IP
 ```
 
-**Related:** [DNS and Networking](../user-guide/network-dns)
+**Related:** [DNS and Networking](/user-guide/network-dns/)
 
 ---
 
@@ -618,7 +618,7 @@ loko dns --help
 loko --version
 ```
 
-**Related:** [CLI Reference](../user-guide/cli-reference)
+**Related:** [CLI Reference](/user-guide/cli-reference/)
 
 ---
 
@@ -856,17 +856,17 @@ tar czf loko-diagnostics.tar.gz *.txt *.json
 
 ### Check Documentation
 
-- [FAQ](faq) - Frequently asked questions
-- [CLI Reference](../user-guide/cli-reference) - Command reference
-- [Configuration Guide](../user-guide/configuration) - Config options
+- [FAQ](/reference/faq/) - Frequently asked questions
+- [CLI Reference](/user-guide/cli-reference/) - Command reference
+- [Configuration Guide](/user-guide/configuration/) - Config options
 
 ### Report Issues
 
 If you can't resolve the issue:
 
 1. **Gather diagnostics** (see above)
-2. **Check existing issues**: [GitHub Issues](https://github.com/getloko/loko/issues)
-3. **Open new issue**: [New Issue](https://github.com/getloko/loko/issues/new)
+2. **Check existing issues**: [GitHub Issues](https://github.com/getloko/loko-releases/issues)
+3. **Open new issue**: [New Issue](https://github.com/getloko/loko-releases/issues/new)
 
 **Include in report:**
 - LoKO version (`loko --version`)
@@ -885,6 +885,6 @@ If you can't resolve the issue:
 
 ## Next Steps
 
-- [Environment Lifecycle](../user-guide/environment-lifecycle) - Managing environments
-- [CLI Reference](../user-guide/cli-reference) - Full command reference
-- [Configuration Guide](../user-guide/configuration) - Customize your setup
+- [Environment Lifecycle](/user-guide/environment-lifecycle/) - Managing environments
+- [CLI Reference](/user-guide/cli-reference/) - Full command reference
+- [Configuration Guide](/user-guide/configuration/) - Customize your setup

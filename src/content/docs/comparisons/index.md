@@ -590,6 +590,6 @@ graph TB
 
 Ready to stop fighting infrastructure and start building?
 
-**[Get Started →](../getting-started/installation)**
+**[Get Started →](/getting-started/installation/)**
 
-**Questions?** Check the [FAQ](../reference/faq) or [open an issue](https://github.com/getloko/loko/issues).
+**Questions?** Check the [FAQ](/reference/faq/) or [open an issue](https://github.com/getloko/loko-releases/issues).

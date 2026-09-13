@@ -19,7 +19,7 @@ This tutorial covers:
 
 **Prerequisites**:
 - LoKO installed
-- Environment created ([First Cluster](first-cluster))
+- Environment created ([First Cluster](/tutorials/first-cluster/))
 
 ---
 
@@ -457,7 +457,7 @@ loko workloads add mongodb --now
 loko workloads add valkey --now
 ```
 
-See [Workload Catalog](../catalog/workloads) for all available workloads.
+See [Workload Catalog](/_catalog/workloads/) for all available workloads.
 
 ---
 
@@ -509,7 +509,7 @@ loko workloads deploy postgres --force
 
 ## See Also
 
-- [Workload Management](../user-guide/workload-management) - Complete workload guide
-- [Workload Catalog](../catalog/workloads) - All available workloads
-- [Custom Workload Tutorial](custom-workload) - Deploy custom applications
-- [First Cluster Tutorial](first-cluster) - Getting started
+- [Workload Management](/user-guide/workload-management/) - Complete workload guide
+- [Workload Catalog](/_catalog/workloads/) - All available workloads
+- [Custom Workload Tutorial](/tutorials/custom-workload/) - Deploy custom applications
+- [First Cluster Tutorial](/tutorials/first-cluster/) - Getting started

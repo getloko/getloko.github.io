@@ -81,6 +81,6 @@ To contribute the change back, open a PR against
 
 ## See also
 
-- **[Catalog Overview](index)** — catalog system overview
-- **[Catalog Schema](schema)** — the `catalog.yaml` / workload file format
-- **[Commands Reference](../../reference/commands)** — `loko catalog` commands
+- **[Catalog Overview](/_catalog/)** — catalog system overview
+- **[Catalog Schema](/_catalog/schema/)** — the `catalog.yaml` / workload file format
+- **[Commands Reference](/reference/commands/)** — `loko catalog` commands

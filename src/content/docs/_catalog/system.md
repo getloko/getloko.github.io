@@ -41,7 +41,7 @@ Because it's a plain git checkout:
 - **Teams** share a fork; **PR previews** are just `git checkout <branch>`
 - **Local overrides** — edit a `workloads/*.yaml` file in place
 
-See [Catalog Source & Updates](remote-sync) for the full workflow.
+See [Catalog Source & Updates](/_catalog/remote-sync/) for the full workflow.
 
 ## Catalog Structure
 
@@ -115,6 +115,6 @@ git -C ~/.loko/catalog pull
 
 ## See Also
 
-- [Catalog Source & Updates](remote-sync) - the catalog directory workflow
-- [Components](components) - Internal components reference
-- [Workloads Overview](workloads/index) - Available workloads
+- [Catalog Source & Updates](/_catalog/remote-sync/) - the catalog directory workflow
+- [Components](/_catalog/components/) - Internal components reference
+- [Workloads Overview](/_catalog/workloads/) - Available workloads

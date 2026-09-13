@@ -7,7 +7,7 @@ description: "Expose an HTTP(S) workload or Ingress to the public internet via n
 public internet through [ngrok](https://ngrok.com). Useful for webhook testing,
 demos, and OAuth redirect URIs that need a public URL.
 
-This is separate from the [Tunnel](tunnel), which forwards raw TCP ports on your
+This is separate from the [Tunnel](/user-guide/tunnel/), which forwards raw TCP ports on your
 LAN. `loko share` is HTTP(S)-only and public.
 
 ## Prerequisites

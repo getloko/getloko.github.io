@@ -641,8 +641,8 @@ Adjust Docker Desktop resources:
 
 ## See Also
 
-- [First Cluster Tutorial](first-cluster) - Getting started
-- [Deploy Database](deploy-database) - Database deployment
-- [Custom Workload](custom-workload) - Custom applications
-- [Configuration Guide](../user-guide/configuration) - Advanced configuration
+- [First Cluster Tutorial](/tutorials/first-cluster/) - Getting started
+- [Deploy Database](/tutorials/deploy-database/) - Database deployment
+- [Custom Workload](/tutorials/custom-workload/) - Custom applications
+- [Configuration Guide](/user-guide/configuration/) - Advanced configuration
 - [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/) - Scheduling concepts

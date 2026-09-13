@@ -472,6 +472,6 @@ kubectl describe pvc -n kube-system zot-storage
 
 ## Next Steps
 
-- [Workload Management](workload-management) - Deploy applications
-- [Certificates](certificates) - TLS certificate setup
-- [Troubleshooting](../reference/troubleshooting) - Registry issues
+- [Workload Management](/user-guide/workload-management/) - Deploy applications
+- [Certificates](/user-guide/certificates/) - TLS certificate setup
+- [Troubleshooting](/reference/troubleshooting/) - Registry issues

@@ -646,6 +646,6 @@ workloads:
 
 ## Next Steps
 
-- [Browse Workloads](workloads/index)
-- [Helm Repositories](repositories)
-- [Contributing Guide](contributing)
+- [Browse Workloads](/_catalog/workloads/)
+- [Helm Repositories](/_catalog/repositories/)
+- [Contributing Guide](/_catalog/contributing/)

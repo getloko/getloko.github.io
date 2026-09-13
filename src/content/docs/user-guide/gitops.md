@@ -48,6 +48,6 @@ loko gitops destroy
 ## Where To Go Next
 
 - Detailed, step-by-step setup: [Tutorial: GitOps Setup](/tutorials/gitops-setup)
-- OCI-based delivery without git write-backs: [GitOps: Gitless Mode](../user-guide/gitops-gitless)
-- Full command reference: [Commands](../reference/commands)
-- Config schema: [Config Schema](../reference/config-schema)
+- OCI-based delivery without git write-backs: [GitOps: Gitless Mode](/user-guide/gitops-gitless/)
+- Full command reference: [Commands](/reference/commands/)
+- Config schema: [Config Schema](/reference/config-schema/)

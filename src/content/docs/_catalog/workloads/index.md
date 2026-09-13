@@ -15,7 +15,7 @@ Relational and NoSQL databases with web management UIs:
 - MongoDB (with mongo-express UI)
 - DynamoDB Local (with dynamodb-ui)
 
-[Browse Databases →](databases)
+[Browse Databases →](/_catalog/workloads/databases/)
 
 ### Cache & Key-Value
 
@@ -25,7 +25,7 @@ In-memory caching systems with unified web management UI:
 - Memcached
 - phpCacheAdmin (unified cache UI)
 
-[Browse Caches →](cache)
+[Browse Caches →](/_catalog/workloads/cache/)
 
 ### Message Queues
 
@@ -37,7 +37,7 @@ Message brokers and streaming platforms:
 - ElasticMQ (SQS-compatible, with web UI)
 - goaws (SNS-compatible)
 
-[Browse Messaging →](messaging)
+[Browse Messaging →](/_catalog/workloads/messaging/)
 
 ### Object Storage
 
@@ -45,7 +45,7 @@ S3-compatible distributed object storage:
 
 - Garage
 
-[Browse Storage →](storage)
+[Browse Storage →](/_catalog/workloads/storage/)
 
 ### DevOps & CI/CD
 
@@ -54,7 +54,7 @@ Git hosting and CI/CD runners:
 - Forgejo (Git hosting)
 - Forgejo Runner (CI/CD)
 
-[Browse DevOps →](devops)
+[Browse DevOps →](/_catalog/workloads/devops/)
 
 ### Dev & Testing Tools
 
@@ -64,7 +64,7 @@ HTTP testing, developer utilities, and email/SMS testing:
 - IT Tools (developer utilities — converters, encoders, formatters)
 - Mock SMTP/SMS
 
-[Browse DevTools →](devtools)
+[Browse DevTools →](/_catalog/workloads/devtools/)
 
 ### GitOps
 
@@ -73,7 +73,7 @@ Continuous delivery and deployment automation (integration coming soon):
 - ArgoCD
 - Flux Operator
 
-[Browse GitOps →](gitops)
+[Browse GitOps →](/_catalog/workloads/gitops/)
 
 ### Collaboration
 
@@ -82,7 +82,7 @@ Virtual whiteboard, design, and diagramming tools:
 - Excalidraw (virtual whiteboard)
 - Penpot (open-source design & prototyping, Figma alternative)
 
-[Browse Collaboration →](collaboration)
+[Browse Collaboration →](/_catalog/workloads/collaboration/)
 
 ## Using Workloads
 
@@ -165,6 +165,6 @@ workloads:
 
 ## Next Steps
 
-- [Database Workloads](databases)
-- [Contributing Guide](../contributing)
-- [Schema Reference](../schema)
+- [Database Workloads](/_catalog/workloads/databases/)
+- [Contributing Guide](/_catalog/contributing/)
+- [Schema Reference](/_catalog/schema/)

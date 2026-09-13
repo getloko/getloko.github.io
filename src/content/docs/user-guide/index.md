@@ -8,23 +8,23 @@ Welcome to the LoKO user guide. This section covers day-to-day usage of LoKO for
 ## Topics
 
 ### Environment Management
-- [Environment Lifecycle](environment-lifecycle) - Create, start, stop, destroy environments
-- [Configuration](configuration) - Understanding and customizing `loko.yaml`
+- [Environment Lifecycle](/user-guide/environment-lifecycle/) - Create, start, stop, destroy environments
+- [Configuration](/user-guide/configuration/) - Understanding and customizing `loko.yaml`
 
 ### Workloads & Services
-- [Workload Management](workload-management) - Deploy and manage workloads
-- [Network & DNS](network-dns) - DNS configuration and domain resolution
-- [Certificates](certificates) - TLS certificate management
-- [Registry](registry) - Local container registry usage
+- [Workload Management](/user-guide/workload-management/) - Deploy and manage workloads
+- [Network & DNS](/user-guide/network-dns/) - DNS configuration and domain resolution
+- [Certificates](/user-guide/certificates/) - TLS certificate management
+- [Registry](/user-guide/registry/) - Local container registry usage
 
 ### Reference
-- [CLI Reference](cli-reference) - Complete command reference
+- [CLI Reference](/user-guide/cli-reference/) - Complete command reference
 
 ## Quick Links
 
-- **Getting Started**: [Quick Start Guide](../getting-started/quick-start)
-- **Tutorials**: [First Cluster Tutorial](../tutorials/first-cluster)
-- **Troubleshooting**: [Common Issues](../reference/troubleshooting)
+- **Getting Started**: [Quick Start Guide](/getting-started/quick-start/)
+- **Tutorials**: [First Cluster Tutorial](/tutorials/first-cluster/)
+- **Troubleshooting**: [Common Issues](/reference/troubleshooting/)
 
 ## Common Tasks
 
@@ -54,6 +54,6 @@ loko logs workload postgres
 
 ## What's Next?
 
-- Learn about [workload management](workload-management)
-- Understand [configuration options](configuration)
-- Explore the [CLI reference](cli-reference)
+- Learn about [workload management](/user-guide/workload-management/)
+- Understand [configuration options](/user-guide/configuration/)
+- Explore the [CLI reference](/user-guide/cli-reference/)
